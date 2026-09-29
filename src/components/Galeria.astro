@@ -1,0 +1,31 @@
+---
+// Fotos de un evento o acuerdo. Solo llegan aquí las marcadas revisada_sin_menores = sí.
+// Se publican solo versiones reducidas (miniatura y una grande de 1600 px); el original nunca se sube,
+// para que el sitio no crezca con cada foto de 4 MB.
+import { Image, getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import type { Foto } from '../lib/datos';
+interface Props { fotos: Foto[] }
+const { fotos } = Astro.props;
+const archivos = import.meta.glob<{ default: ImageMetadata }>('/fotos/**/*.{jpg,jpeg,png,webp,JPG,JPEG,PNG,WEBP}', { eager: true });
+const lista = await Promise.all(
+  fotos
+    .map((f) => ({ ...f, img: archivos[`/fotos/${f.archivo}`]?.default }))
+    .filter((f) => f.img)
+    .map(async (f) => ({ ...f, grande: await getImage({ src: f.img!, width: Math.min(1600, f.img!.width), format: 'webp' }) })),
+);
+---
+{lista.length > 0 && (
+  <ul class="galeria">
+    {lista.map((f) => (
+      <li>
+        <figure>
+          <a href={f.grande.src}>
+            <Image src={f.img!} alt={f.descripcion} widths={[400, 800]} sizes="(min-width: 60rem) 22rem, 100vw" />
+          </a>
+          <figcaption>{f.descripcion}{f.credito && ` Foto: ${f.credito}.`}</figcaption>
+        </figure>
+      </li>
+    ))}
+  </ul>
+)}

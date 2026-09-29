@@ -1,0 +1,38 @@
+---
+import Base from '../../layouts/Base.astro';
+import Filtros from '../../components/Filtros.astro';
+import ItemAcuerdo from '../../components/ItemAcuerdo.astro';
+import { datos, sitio } from '../../lib/datos';
+import { tablaAcuerdos } from '../../lib/exportar';
+import { anioDe, ETIQUETAS } from '../../lib/formato';
+
+const { acuerdos, normales } = datos();
+const anios = [...new Set(acuerdos.map((a) => anioDe(a.fecha)).filter(Boolean))].sort().reverse();
+const tipos = Object.entries(ETIQUETAS.tipoAcuerdo).filter(([t]) => acuerdos.some((a) => a.tipo === t));
+---
+<Base titulo="Vinculación: acuerdos de colaboración" descripcion="Acuerdos, cartas compromiso y convenios firmados por la Red CAENN y sus escuelas normales con otras instituciones, con el documento firmado.">
+  <div class="contenedor">
+    <header class="encabezado-pagina">
+      <h1>Vinculación</h1>
+      <p class="intro">{sitio.textos.acuerdos_intro}</p>
+    </header>
+
+    <Filtros
+      lista="tabla-acuerdos"
+      archivo="acuerdos"
+      total={acuerdos.length}
+      sustantivo={['acuerdo', 'acuerdos']}
+      tabla={tablaAcuerdos()}
+      filtros={[
+        { nombre: 'normal', etiqueta: 'Normal', opciones: normales.map((n) => [n.id, n.corto]) },
+        { nombre: 'anio', etiqueta: 'Año', opciones: anios.map((a) => [a, a]) },
+        { nombre: 'tipo', etiqueta: 'Tipo', opciones: tipos },
+      ]}
+    />
+
+    <h2 class="sr">Acuerdos</h2>
+    <ul class="registros" id="tabla-acuerdos">
+      {acuerdos.map((a) => <ItemAcuerdo a={a} />)}
+    </ul>
+  </div>
+</Base>

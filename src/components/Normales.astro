@@ -1,0 +1,14 @@
+---
+// Escuelas normales de un registro, en una sola línea discreta.
+// Si son dos o más, se antepone «Colaboración» (la evidencia que pide SECIHTI).
+import type { Normal } from '../lib/datos';
+import { u } from '../lib/formato';
+interface Props { normales: Normal[] }
+const { normales } = Astro.props;
+---
+{normales.length > 0 && (
+  <p class="normales-linea">
+    {normales.length >= 2 && <span class="colab">Colaboración</span>}
+    {normales.map((n, i) => <>{i > 0 && <span aria-hidden="true"> · </span>}<a href={u(n.ruta)} title={n.nombre}>{n.corto}</a></>)}
+  </p>
+)}

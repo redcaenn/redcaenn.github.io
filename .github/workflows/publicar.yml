@@ -1,0 +1,69 @@
+# Construye y publica el sitio en GitHub Pages.
+# Corre al aprobar cambios en main, una vez al día (para que "Próximos eventos" esté al día)
+# y cuando se pide a mano desde la pestaña Actions.
+name: Publicar sitio
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 12 * * *' # 5:00 en Tijuana / 6:00 en Ciudad de México
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  construir:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      # Guarda las fotos ya reducidas entre una publicación y otra,
+      # para que solo se procesen las fotos nuevas.
+      - name: Recuperar fotos ya procesadas
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.astro
+          key: fotos-${{ hashFiles('fotos/**') }}
+          restore-keys: fotos-
+
+      - name: Revisar los datos
+        run: |
+          npm run validar
+          if ! git diff --quiet -- datos/_registro.json; then
+            echo "::warning::Hay registros nuevos sin fecha de alta guardada. Llegaron sin pasar por una propuesta de cambios; sus fechas se calcularán de nuevo en cada publicación hasta que se guarde datos/_registro.json."
+          fi
+
+      - name: Construir
+        run: npx astro build && node scripts/limpiar.mjs
+        env:
+          # Mientras no se conecte redcaenn.com, definir en Settings → Variables:
+          #   SITE = https://<usuario>.github.io   BASE = /<repositorio>
+          SITE: ${{ vars.SITE }}
+          BASE: ${{ vars.BASE }}
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  publicar:
+    needs: construir
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

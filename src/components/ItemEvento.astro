@@ -1,0 +1,24 @@
+---
+import type { Evento } from '../lib/datos';
+import { u, marcar, etiqueta, rango, anioDe, esPendiente } from '../lib/formato';
+import Normales from './Normales.astro';
+interface Props { e: Evento }
+const { e } = Astro.props;
+const lugar = [e.sede, e.ciudad, e.pais].filter((x) => x && !esPendiente(x));
+---
+<li
+  class="registro"
+  data-id={e.id}
+  data-f-normal={e.normalesR.map((n) => n.id).join(' ')}
+  data-f-anio={anioDe(e.fecha_inicio)}
+  data-f-tipo={e.tipo}
+  data-buscar={[e.titulo, e.sede, e.ciudad, e.descripcion, e.instituciones].join(' ')}
+>
+  <p class="registro-cabeza">
+    <time datetime={esPendiente(e.fecha_inicio) ? undefined : e.fecha_inicio}>{rango(e.fecha_inicio, e.fecha_fin)}</time>
+    {' · '}{e.serie && e.sesion ? `Seminario, sesión ${e.sesion}` : etiqueta('tipoEvento', e.tipo)}
+  </p>
+  <h3><a href={u(e.ruta)} set:html={marcar(e.titulo)} /></h3>
+  {lugar.length > 0 && <p class="meta">{lugar.join(', ')}</p>}
+  <Normales normales={e.normalesR} />
+</li>

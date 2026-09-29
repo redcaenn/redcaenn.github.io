@@ -1,0 +1,191 @@
+---
+// Solo el juego de caracteres latino (incluye á é í ó ú ñ ü ¿ ¡ « »). Se precarga y usa
+// font-display: optional para que el texto nunca cambie de letra ya dibujado (eso causaba un "brinco").
+import sansUrl from '@fontsource-variable/source-sans-3/files/source-sans-3-latin-wght-normal.woff2?url';
+import serifUrl from '@fontsource-variable/source-serif-4/files/source-serif-4-latin-wght-normal.woff2?url';
+import '../styles/global.css';
+import { sitio, datos } from '../lib/datos';
+import { u, limpio, marcar, esPendiente } from '../lib/formato';
+
+interface Props {
+  titulo: string;
+  descripcion?: string;
+  imagen?: string;
+  tipoOG?: string;
+  jsonld?: object | object[];
+  sinIndice?: boolean;
+}
+const { titulo, descripcion = sitio.textos.presentacion, imagen, tipoOG = 'website', jsonld, sinIndice = false } = Astro.props;
+
+const tituloPestana = titulo === sitio.nombre_corto ? `${sitio.nombre_corto} · ${sitio.nombre}` : `${limpio(titulo)} · ${sitio.nombre_corto}`;
+const desc = limpio(descripcion).slice(0, 300);
+const canonica = new URL(Astro.url.pathname, Astro.site).href;
+const imagenOG = new URL(imagen ?? u('/og.png'), Astro.site).href;
+
+const nav = [
+  ['/repositorio/', 'Repositorio'],
+  ['/seminario/', 'Seminario'],
+  ['/eventos/', 'Eventos'],
+  ['/vinculacion/', 'Vinculación'],
+  ['/divulgacion/', 'Divulgación'],
+];
+const actual = Astro.url.pathname.replace(import.meta.env.BASE_URL.replace(/\/$/, ''), '');
+const esActual = (ruta: string) => actual === ruta || (actual.startsWith(ruta) && ruta !== '/');
+
+const { normales, productos, eventos, acuerdos, divulgacion, personas } = datos();
+const hayEjemplos = [...productos, ...eventos, ...acuerdos, ...divulgacion].some((r) => r.ejemplo) || personas.some((p) => p.nombres.includes('[EJEMPLO]'));
+const redes = Object.entries(sitio.redes as Record<string, string>).filter(([, url]) => url);
+const nombresRed: Record<string, string> = { facebook: 'Facebook', instagram: 'Instagram', youtube: 'YouTube', whatsapp: 'Canal de WhatsApp' };
+const ld = [jsonld].flat().filter(Boolean);
+const fuentes = [
+  ['Source Sans 3 Variable', sansUrl],
+  ['Source Serif 4 Variable', serifUrl],
+]
+  .map(([familia, url]) => `@font-face{font-family:'${familia}';font-style:normal;font-weight:200 900;font-display:optional;src:url(${url}) format('woff2-variations'),url(${url}) format('woff2');}`)
+  .join('');
+---
+<!doctype html>
+<html lang="es-MX">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{tituloPestana}</title>
+    <meta name="description" content={desc} />
+    <link rel="canonical" href={canonica} />
+    {/* Mientras haya datos de ejemplo, la versión de revisión no aparece en buscadores. */}
+    {(sinIndice || hayEjemplos) && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="preload" href={sansUrl} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={serifUrl} as="font" type="font/woff2" crossorigin />
+    <style is:inline set:html={fuentes} />
+    <link rel="icon" type="image/png" sizes="32x32" href={u('/favicon-32.png')} />
+    <link rel="apple-touch-icon" href={u('/apple-touch-icon.png')} />
+    <link rel="sitemap" href={u('/sitemap-index.xml')} />
+    <meta name="theme-color" content="#573420" />
+    <meta property="og:site_name" content={sitio.nombre_corto} />
+    <meta property="og:locale" content="es_MX" />
+    <meta property="og:type" content={tipoOG} />
+    <meta property="og:title" content={limpio(titulo)} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:url" content={canonica} />
+    <meta property="og:image" content={imagenOG} />
+    <meta name="twitter:card" content="summary_large_image" />
+    {ld.map((o) => <script type="application/ld+json" set:html={JSON.stringify(o)} />)}
+    <script is:inline>document.documentElement.classList.add('js')</script>
+  </head>
+  <body>
+    <a class="saltar" href="#contenido">Saltar al contenido</a>
+    {hayEjemplos && (
+      <aside class="banda-ejemplo" aria-label="Aviso de revisión">
+        <p>Versión de revisión: este sitio contiene datos de <mark class="marca marca-ejemplo">Ejemplo</mark> que se borran antes de publicarlo como evidencia.</p>
+      </aside>
+    )}
+    <header class="cabecera">
+      <div class="contenedor">
+        <a href={u('/')} class="marca-sitio" aria-label={`${sitio.nombre_corto}: inicio`}>
+          <img src={u('/logo-400.webp')} width="400" height="173" alt={`${sitio.nombre_corto}, ${sitio.nombre}`} />
+        </a>
+        <button class="menu-boton" type="button" aria-expanded="false" aria-controls="nav-principal">
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Menú
+        </button>
+        <nav class="nav" id="nav-principal" aria-label="Principal">
+          <ul>
+            {nav.map(([ruta, texto]) => (
+              <li><a href={u(ruta)} aria-current={esActual(ruta) ? 'page' : undefined}>{texto}</a></li>
+            ))}
+            <li><a class="nav-registro" href={u('/registro/')} aria-current={esActual('/registro/') ? 'page' : undefined}>Registro</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main id="contenido">
+      <slot />
+    </main>
+
+    <footer class="pie">
+      <div class="contenedor">
+        <div class="pie-rejilla">
+          <section aria-labelledby="pie-red">
+            <h2 id="pie-red">{sitio.nombre_corto}</h2>
+            <p>{sitio.nombre}. Constituida en {sitio.fundacion}.</p>
+            <p>
+              Contacto:{' '}
+              {esPendiente(sitio.correo) ? <Fragment set:html={marcar(sitio.correo)} /> : <a href={`mailto:${sitio.correo}`}>{sitio.correo}</a>}
+            </p>
+            <h2 id="pie-redes">Redes sociales{!sitio.redes_confirmadas && <> <mark class="marca marca-pendiente">Por confirmar</mark></>}</h2>
+            <ul aria-labelledby="pie-redes">
+              {redes.map(([red, url]) => (
+                <li>
+                  {esPendiente(url) ? (
+                    <>{nombresRed[red] ?? red}: <Fragment set:html={marcar(url)} /></>
+                  ) : (
+                    <a href={url} rel="me noopener">{nombresRed[red] ?? red}</a>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </section>
+          <section aria-labelledby="pie-normales">
+            <h2 id="pie-normales">Escuelas normales</h2>
+            <ul>
+              {normales.map((n) => (
+                <li><a href={u(n.ruta)}>{n.nombre}</a></li>
+              ))}
+            </ul>
+          </section>
+          <section aria-labelledby="pie-expediente">
+            <h2 id="pie-expediente">Expediente</h2>
+            <ul>
+              <li><a href={u('/repositorio/')}>Repositorio de investigación</a></li>
+              <li><a href={u('/seminario/')}>Seminario Latinoamericano</a></li>
+              <li><a href={u('/vinculacion/')}>Acuerdos de colaboración</a></li>
+              <li><a href={u('/divulgacion/')}>Bitácora de divulgación</a></li>
+              <li><a href={u('/datos/')}>Datos abiertos (CSV)</a></li>
+              <li><a href={u('/registro/')}>Registro a la Red</a></li>
+            </ul>
+          </section>
+        </div>
+        <p class="pie-legal">
+          Cada registro tiene un enlace permanente y muestra su fecha de publicación y de última actualización en este sitio.
+          Este sitio no usa cookies.
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      const boton = document.querySelector<HTMLButtonElement>('.menu-boton');
+      const nav = document.getElementById('nav-principal');
+      if (boton && nav) {
+        boton.addEventListener('click', () => {
+          const abierto = nav.classList.toggle('abierto');
+          boton.setAttribute('aria-expanded', String(abierto));
+        });
+      }
+      // Botones "Copiar": data-copiar = texto; data-copiar-html = versión con formato (cursivas)
+      document.addEventListener('click', async (e) => {
+        const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-copiar]');
+        if (!b) return;
+        const texto = b.dataset.copiar!;
+        const html = b.dataset.copiarHtml;
+        try {
+          if (html && 'ClipboardItem' in window) {
+            await navigator.clipboard.write([
+              new ClipboardItem({
+                'text/plain': new Blob([texto], { type: 'text/plain' }),
+                'text/html': new Blob([html], { type: 'text/html' }),
+              }),
+            ]);
+          } else {
+            await navigator.clipboard.writeText(texto);
+          }
+          const antes = b.textContent;
+          b.textContent = 'Copiado ✓';
+          setTimeout(() => (b.textContent = antes), 1800);
+        } catch {
+          prompt('Copia el texto:', texto);
+        }
+      });
+    </script>
+  </body>
+</html>

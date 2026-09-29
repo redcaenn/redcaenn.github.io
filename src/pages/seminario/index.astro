@@ -1,0 +1,104 @@
+---
+import Base from '../../layouts/Base.astro';
+import Normales from '../../components/Normales.astro';
+import { datos, sitio } from '../../lib/datos';
+import { u, marcar, rango, fecha, esPendiente, etiqueta, ETIQUETAS, hoyISO } from '../../lib/formato';
+import { enlace } from '../../lib/exportar';
+
+const s = sitio.seminario;
+const { eventos, obra } = datos();
+const delSeminario = eventos.filter((e) => e.serie === 'seminario-latinoamericano').reverse();
+const hoy = hoyISO();
+const estados = Object.keys(ETIQUETAS.estadoCapitulo);
+const porEstado = estados.map((e) => [etiqueta('estadoCapitulo', e), obra.filter((c) => c.estado === e).length] as const).filter(([, n]) => n > 0);
+const ejemploObra = obra.some((c) => c.titulo.includes('[EJEMPLO]'));
+
+const ld = {
+  '@context': 'https://schema.org',
+  '@type': 'EventSeries',
+  name: s.nombre,
+  url: enlace('/seminario/'),
+  description: s.objetivo,
+  organizer: { '@type': 'Organization', name: sitio.nombre, url: enlace('/') },
+  subEvent: delSeminario.map((e) => ({ '@id': enlace(e.ruta) })),
+};
+---
+<Base titulo="Seminario Latinoamericano" descripcion={s.objetivo} jsonld={ld}>
+  <div class="contenedor">
+    <header class="encabezado-pagina cabecera-con-ficha">
+      <div>
+        <p class="registro-cabeza">{s.etapa}</p>
+        <h1>{s.nombre}</h1>
+        <p class="intro">{s.objetivo}</p>
+      </div>
+      <aside class="lateral" aria-label="Datos del Seminario">
+        <p class="lateral-titulo">Coordinación general</p>
+        <ul class="lista-simple">{s.coordinacion.map((c: string) => <li>{c}</li>)}</ul>
+        <p class="lateral-titulo">Sesiones registradas</p>
+        <p>{delSeminario.filter((e) => e.sesion).length}</p>
+        {s.programa && <a class="boton boton-secundario boton-ancho" href={u(`/documentos/eventos/${s.programa}`)}>Programa del Seminario (PDF)</a>}
+      </aside>
+    </header>
+
+    <section aria-labelledby="sesiones-t">
+      <h2 id="sesiones-t">Sesiones</h2>
+      <ol class="sesiones">
+        {delSeminario.map((e) => (
+          <li class="sesion">
+            <span class="sesion-num">{e.sesion ? `Sesión ${e.sesion}` : etiqueta('tipoEvento', e.tipo)}</span>
+            <h3><a href={u(e.ruta)} set:html={marcar(e.titulo)} /></h3>
+            <p class="meta" style="margin:0">
+              <time datetime={esPendiente(e.fecha_inicio) ? undefined : e.fecha_inicio}>{rango(e.fecha_inicio, e.fecha_fin)}</time>
+              {' · '}<span set:html={[e.sede, e.ciudad, e.pais].filter((x) => x && !esPendiente(x)).map(marcar).join(', ')} />
+            </p>
+            {(e.videoId || e.fotos.length > 0) && <p class="meta" style="margin:0">{[e.videoId && 'Con video', e.fotos.length > 0 && `${e.fotos.length} fotos`].filter(Boolean).join(' · ')}</p>}
+            <Normales normales={e.normalesR} />
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <div class="rejilla rejilla-2">
+      <section aria-labelledby="obra-t">
+        <h2 id="obra-t">Obra editorial colectiva</h2>
+        <p>Resultado central del Seminario. Avance de los capítulos:</p>
+        {ejemploObra && <div class="aviso"><p>Los capítulos que aparecen aquí son <mark class="marca marca-ejemplo">Ejemplo</mark>. Se reemplazan en <code>datos/obra_colectiva.csv</code>.</p></div>}
+        <p class="meta">{obra.length} capítulos registrados: {porEstado.map(([t, n]) => `${n} ${t.toLowerCase()}`).join(' · ')}</p>
+        <div class="tabla-envoltura">
+          <table>
+            <caption class="sr">Capítulos de la obra colectiva</caption>
+            <thead><tr><th scope="col">Capítulo</th><th scope="col">Autores</th><th scope="col">Estado</th></tr></thead>
+            <tbody>
+              {obra.map((c) => (
+                <tr>
+                  <td set:html={`${c.orden}. ${marcar(c.titulo)}`} />
+                  <td set:html={c.autoresR.map((a) => marcar(a.texto)).join(', ')} />
+                  <td>{etiqueta('estadoCapitulo', c.estado)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section aria-labelledby="crono-t">
+        <h2 id="crono-t">Cronograma {s.etapa.replace('Etapa ', '')}</h2>
+        <ul class="cronograma">
+          {s.cronograma.map((c: { fecha: string; hasta?: string; texto: string }) => (
+            <li class={(c.hasta ?? c.fecha) < hoy.slice(0, 7) ? 'pasado' : ''}>
+              <time datetime={c.fecha}>{c.hasta ? `${fecha(c.fecha)} a ${fecha(c.hasta)}` : fecha(c.fecha)}</time>
+              {c.texto}
+            </li>
+          ))}
+        </ul>
+
+        <h2>Productos previstos</h2>
+        <ul>{s.productos_previstos.map((p: string) => <li>{p}</li>)}</ul>
+
+        <h2>Participan</h2>
+        <ul>{s.participan.map((p: string) => <li>{p}</li>)}</ul>
+
+      </section>
+    </div>
+  </div>
+</Base>

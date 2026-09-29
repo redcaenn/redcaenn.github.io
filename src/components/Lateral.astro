@@ -1,0 +1,17 @@
+---
+// Enlace permanente y fechas del registro.
+import { enlace } from '../lib/exportar';
+import { fecha } from '../lib/formato';
+interface Props { ruta: string; alta: string; actualizado: string; id: string }
+const { ruta, alta, actualizado } = Astro.props;
+const url = enlace(ruta);
+---
+<aside class="lateral" aria-label="Enlace permanente y fechas">
+  <p class="lateral-url">{url.replace(/^https?:\/\//, '')}</p>
+  <button type="button" class="boton boton-secundario boton-ancho" data-copiar={url}>Copiar enlace permanente</button>
+  <p class="lateral-fechas">
+    Publicado el <time datetime={alta}>{fecha(alta)}</time>
+    {actualizado !== alta && <><br />Actualizado el <time datetime={actualizado}>{fecha(actualizado)}</time></>}
+  </p>
+  <slot />
+</aside>

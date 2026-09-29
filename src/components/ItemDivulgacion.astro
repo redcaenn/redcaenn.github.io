@@ -1,0 +1,27 @@
+---
+import type { Divulgacion } from '../lib/datos';
+import { u, marcar, etiqueta, fecha, anioDe, esPendiente } from '../lib/formato';
+import Normales from './Normales.astro';
+interface Props { d: Divulgacion }
+const { d } = Astro.props;
+const personas = d.personasR.map((p) => p.nombreCompleto).join(', ');
+---
+<li
+  class="registro"
+  data-id={d.id}
+  data-f-normal={d.normalesR.map((n) => n.id).join(' ')}
+  data-f-persona={d.personasR.map((p) => p.id).join(' ')}
+  data-f-anio={anioDe(d.fecha)}
+  data-f-tipo={d.tipo}
+  data-f-red={d.red}
+  data-f-serie={d.serie}
+  data-buscar={[d.titulo, d.medio, d.serie, personas].join(' ')}
+>
+  <p class="registro-cabeza">
+    {esPendiente(d.fecha) ? 'Sin fecha' : <time datetime={d.fecha}>{fecha(d.fecha)}</time>}
+    {' · '}{d.medio ? <span set:html={marcar(d.medio)} /> : etiqueta('red', d.red)}
+  </p>
+  <h3><a href={u(d.ruta)} set:html={marcar(d.titulo)} /></h3>
+  {personas && <p class="meta" set:html={marcar(personas)} />}
+  <Normales normales={d.normalesR} />
+</li>

@@ -1,0 +1,34 @@
+---
+import Base from '../../layouts/Base.astro';
+import { datos, evidenciaDe } from '../../lib/datos';
+import { u, marcar, plural } from '../../lib/formato';
+
+const { normales, personas } = datos();
+const estados = [...new Set(normales.map((n) => n.estado))];
+---
+<Base titulo="Escuelas normales de la Red" descripcion={`Las ${normales.length} escuelas normales de ${estados.length} estados del noroeste de México que integran la Red CAENN.`}>
+  <div class="contenedor">
+    <header class="encabezado-pagina">
+      <h1>Escuelas normales</h1>
+      <p class="intro">{normales.length} escuelas normales de {estados.length} estados: {estados.join(', ')}.</p>
+    </header>
+    <div class="rejilla rejilla-2">
+      {normales.map((n) => {
+        const ev = evidenciaDe({ normal: n.id });
+        const gente = personas.filter((p) => p.normal === n.id);
+        return (
+          <article class="tarjeta">
+            <p class="registro-cabeza">{n.estado}</p>
+            <h2 style="margin:.2rem 0 .5rem;font-size:1.2rem"><a href={u(n.ruta)}>{n.nombre}</a></h2>
+            <p class="meta">{n.siglas && `${n.siglas} · `}<span set:html={marcar(n.ciudad)} />, {n.estado}</p>
+            <p class="meta">
+              {plural(ev.productos.length, 'producto', 'productos')} · {plural(ev.eventos.length, 'evento', 'eventos')} ·{' '}
+              {plural(ev.acuerdos.length, 'acuerdo', 'acuerdos')} · {plural(ev.divulgacion.length, 'publicación', 'publicaciones')}
+              {gente.length > 0 && ` · ${plural(gente.length, 'persona', 'personas')}`}
+            </p>
+          </article>
+        );
+      })}
+    </div>
+  </div>
+</Base>

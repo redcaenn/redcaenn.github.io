@@ -1,0 +1,20 @@
+---
+// Página de un registro retirado: el enlace sigue existiendo porque puede estar citado.
+import Base from '../layouts/Base.astro';
+import type { Retirado } from '../lib/datos';
+import { fecha, u, marcar } from '../lib/formato';
+interface Props { r: Retirado; seccion: [string, string] }
+const { r, seccion } = Astro.props;
+---
+<Base titulo={`Registro retirado: ${r.titulo}`} sinIndice>
+  <div class="contenedor">
+    <p class="migas"><a href={u(seccion[0])}>{seccion[1]}</a> / {r.id}</p>
+    <header class="encabezado-pagina">
+      <h1 set:html={marcar(r.titulo)} />
+      <div class="aviso">
+        <p><strong>Registro retirado el {fecha(r.fecha_retiro)}.</strong> {r.motivo}</p>
+        <p>Este enlace se conserva porque pudo haberse citado en solicitudes o informes.</p>
+      </div>
+    </header>
+  </div>
+</Base>

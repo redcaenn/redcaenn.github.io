@@ -1,0 +1,75 @@
+---
+import Base from '../../layouts/Base.astro';
+import Lateral from '../../components/Lateral.astro';
+import Normales from '../../components/Normales.astro';
+import Retirado from '../../components/Retirado.astro';
+import { datos, retiradosDe, type Producto, type Retirado as R } from '../../lib/datos';
+import { u, marcar, etiqueta, esPendiente, limpio } from '../../lib/formato';
+import { producto as ld } from '../../lib/ld';
+
+export function getStaticPaths() {
+  return [
+    ...datos().productos.map((p) => ({ params: { id: p.id }, props: { p } })),
+    ...retiradosDe('productos').map((r) => ({ params: { id: r.id }, props: { r } })),
+  ];
+}
+const { p, r } = Astro.props as { p?: Producto; r?: R };
+const v = (x?: string) => (x && !esPendiente(x) ? x : '');
+---
+{r && <Retirado r={r} seccion={['/repositorio/', 'Repositorio']} />}
+{p && (
+  <Base titulo={p.titulo} descripcion={p.resumen || p.cita.texto} tipoOG="article" jsonld={ld(p)}>
+    <div class="contenedor">
+      <p class="migas"><a href={u('/repositorio/')}>Repositorio</a> / {p.id}</p>
+      <header class="encabezado-pagina">
+        <p class="registro-cabeza">{etiqueta('tipoProducto', p.tipo)} · {p.anio}</p>
+        <h1 set:html={marcar(p.titulo)} />
+        <Normales normales={p.normalesR} />
+      </header>
+
+      <div class="ficha">
+        <div>
+          <section class="cita" aria-labelledby="cita-t">
+            <h2 id="cita-t" class="sr">Cómo citar</h2>
+            <p><strong>Cómo citar (APA 7)</strong></p>
+            <p class="cita-texto" set:html={p.cita.html.replace(/\[EJEMPLO\]/g, '<mark class="marca marca-ejemplo">Ejemplo</mark>')} />
+            <button type="button" class="boton boton-secundario boton-chico" data-copiar={limpio(p.cita.texto)} data-copiar-html={p.cita.html.replace(/\[EJEMPLO\]\s*/g, '')}>Copiar cita</button>
+          </section>
+
+          <dl class="datos">
+            <dt>Autores</dt>
+            <dd>
+              <ul>
+                {p.autoresR.map((a) => (
+                  <li>
+                    {a.persona ? <a href={u(a.persona.ruta)} set:html={marcar(a.texto)} /> : <span set:html={marcar(a.texto)} />}
+                    {a.persona?.normalR && <> ({a.persona.normalR.corto})</>}
+                  </li>
+                ))}
+              </ul>
+            </dd>
+            {v(p.fuente) && <><dt>{p.tipo === 'articulo' ? 'Revista' : p.tipo === 'capitulo' ? 'Libro' : 'Publicado en'}</dt><dd set:html={marcar(p.fuente)} /></>}
+            {v(p.editores) && <><dt>Editores</dt><dd set:html={marcar(p.editores)} /></>}
+            {v(p.editorial) && <><dt>Editorial</dt><dd set:html={marcar(p.editorial)} /></>}
+            {(v(p.volumen) || v(p.numero)) && <><dt>Volumen y número</dt><dd>{[v(p.volumen) && `Vol. ${p.volumen}`, v(p.numero) && `núm. ${p.numero}`].filter(Boolean).join(', ')}</dd></>}
+            {v(p.paginas) && <><dt>Páginas</dt><dd>{p.paginas}</dd></>}
+            <dt>Año</dt><dd>{p.anio}</dd>
+            {p.doi && <><dt>DOI</dt><dd><a href={p.doiUrl} rel="noopener">{p.doi}</a></dd></>}
+            {v(p.isbn) && <><dt>ISBN</dt><dd>{p.isbn}</dd></>}
+            {v(p.issn) && <><dt>ISSN</dt><dd>{p.issn}</dd></>}
+            {v(p.url) && <><dt>Enlace</dt><dd><a href={p.url} rel="noopener">{p.url}</a></dd></>}
+            <dt>Acceso abierto</dt><dd>{/^s/i.test(p.acceso_abierto) ? 'Sí' : 'No'}</dd>
+            {p.lineaR && <><dt>Línea de investigación</dt><dd>{p.lineaR.nombre}</dd></>}
+            <dt>Escuelas normales</dt>
+            <dd>{p.normalesR.length ? p.normalesR.map((n, i) => <>{i > 0 && ', '}<a href={u(n.ruta)}>{n.nombre}</a></>) : '—'}</dd>
+            {v(p.resumen) && <><dt>Resumen</dt><dd set:html={marcar(p.resumen)} /></>}
+          </dl>
+        </div>
+        <Lateral ruta={p.ruta} id={p.id} alta={p.alta} actualizado={p.actualizado}>
+          {v(p.pdf) && <p><a class="boton" href={u(`/documentos/productos/${p.pdf}`)}>Descargar PDF</a></p>}
+          {p.doiUrl && <p><a href={p.doiUrl} rel="noopener">Abrir en la editorial (DOI)</a></p>}
+        </Lateral>
+      </div>
+    </div>
+  </Base>
+)}

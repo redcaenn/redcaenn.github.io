@@ -1,0 +1,23 @@
+---
+import type { Producto } from '../lib/datos';
+import { u, marcar, etiqueta } from '../lib/formato';
+import Normales from './Normales.astro';
+interface Props { p: Producto }
+const { p } = Astro.props;
+const autores = p.autoresR.map((a) => a.texto).join(', ');
+---
+<li
+  class="registro"
+  data-id={p.id}
+  data-f-normal={p.normalesR.map((n) => n.id).join(' ')}
+  data-f-anio={p.anio}
+  data-f-tipo={p.tipo}
+  data-f-linea={p.linea}
+  data-f-acceso={/^s/i.test(p.acceso_abierto) ? 'si' : 'no'}
+  data-buscar={[p.titulo, autores, p.fuente, p.editorial, p.doi, p.isbn].join(' ')}
+>
+  <p class="registro-cabeza"><time datetime={p.anio}>{p.anio}</time> · {etiqueta('tipoProducto', p.tipo)}</p>
+  <h3><a href={u(p.ruta)} set:html={marcar(p.titulo)} /></h3>
+  <p class="meta" set:html={marcar([autores, p.fuente].filter(Boolean).join(' — '))} />
+  <Normales normales={p.normalesR} />
+</li>

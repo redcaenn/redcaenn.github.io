@@ -1,0 +1,36 @@
+---
+import Base from '../../layouts/Base.astro';
+import Filtros from '../../components/Filtros.astro';
+import ItemEvento from '../../components/ItemEvento.astro';
+import { datos } from '../../lib/datos';
+import { tablaEventos } from '../../lib/exportar';
+import { ETIQUETAS, anioDe } from '../../lib/formato';
+
+const { eventos, normales } = datos();
+const anios = [...new Set(eventos.map((e) => anioDe(e.fecha_inicio)).filter(Boolean))].sort().reverse();
+const tipos = Object.entries(ETIQUETAS.tipoEvento).filter(([t]) => eventos.some((e) => e.tipo === t));
+---
+<Base titulo="Eventos" descripcion="Encuentros, reuniones, seminarios y congresos de la Red CAENN, con fecha, sede, escuelas normales e instituciones participantes.">
+  <div class="contenedor">
+    <header class="encabezado-pagina">
+      <h1>Eventos</h1>
+      <p class="intro">Encuentros, reuniones de trabajo y sesiones de seminario de la Red, con sede, fechas y escuelas normales participantes.</p>
+    </header>
+    <Filtros
+      lista="lista-eventos"
+      archivo="eventos"
+      total={eventos.length}
+      sustantivo={['evento', 'eventos']}
+      tabla={tablaEventos()}
+      filtros={[
+        { nombre: 'normal', etiqueta: 'Normal', opciones: normales.map((n) => [n.id, n.corto]) },
+        { nombre: 'anio', etiqueta: 'Año', opciones: anios.map((a) => [a, a]) },
+        { nombre: 'tipo', etiqueta: 'Tipo', opciones: tipos },
+      ]}
+    />
+    <h2 class="sr">Eventos</h2>
+    <ul class="registros" id="lista-eventos">
+      {eventos.map((e) => <ItemEvento e={e} />)}
+    </ul>
+  </div>
+</Base>

@@ -1,0 +1,19 @@
+---
+import Base from '../layouts/Base.astro';
+import { u } from '../lib/formato';
+---
+<Base titulo="Página no encontrada" sinIndice>
+  <div class="contenedor">
+    <header class="encabezado-pagina">
+      <h1>Página no encontrada</h1>
+      <p class="intro">La dirección no existe. Si llegaste aquí desde un enlace del sitio anterior, busca el registro en:</p>
+    </header>
+    <ul>
+      <li><a href={u('/repositorio/')}>Repositorio de investigación</a></li>
+      <li><a href={u('/seminario/')}>Seminario Latinoamericano</a></li>
+      <li><a href={u('/eventos/')}>Eventos</a></li>
+      <li><a href={u('/vinculacion/')}>Vinculación</a></li>
+      <li><a href={u('/divulgacion/')}>Divulgación</a></li>
+    </ul>
+  </div>
+</Base>

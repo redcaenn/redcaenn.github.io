@@ -1,0 +1,22 @@
+---
+import type { Acuerdo } from '../lib/datos';
+import { u, marcar, etiqueta, fecha, anioDe, esPendiente } from '../lib/formato';
+import Normales from './Normales.astro';
+interface Props { a: Acuerdo }
+const { a } = Astro.props;
+---
+<li
+  class="registro"
+  data-id={a.id}
+  data-f-normal={a.normalesR.map((n) => n.id).join(' ')}
+  data-f-anio={anioDe(a.fecha)}
+  data-f-tipo={a.tipo}
+  data-buscar={[a.titulo, a.instituciones, a.lugar].join(' ')}
+>
+  <p class="registro-cabeza">
+    <time datetime={esPendiente(a.fecha) ? undefined : a.fecha}>{fecha(a.fecha)}</time> · {etiqueta('tipoAcuerdo', a.tipo)}
+  </p>
+  <h3><a href={u(a.ruta)} set:html={marcar(a.titulo)} /></h3>
+  {a.instituciones_l.length > 0 && <p class="meta">Con {a.instituciones_l.join(', ')}</p>}
+  <Normales normales={a.normalesR} />
+</li>

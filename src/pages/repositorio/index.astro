@@ -1,0 +1,41 @@
+---
+import Base from '../../layouts/Base.astro';
+import Filtros from '../../components/Filtros.astro';
+import ItemProducto from '../../components/ItemProducto.astro';
+import { datos } from '../../lib/datos';
+import { tablaProductos } from '../../lib/exportar';
+import { ETIQUETAS } from '../../lib/formato';
+
+const { productos, normales, lineas } = datos();
+const anios = [...new Set(productos.map((p) => p.anio))].sort().reverse();
+const tipos = Object.entries(ETIQUETAS.tipoProducto).filter(([t]) => productos.some((p) => p.tipo === t));
+---
+<Base titulo="Repositorio de investigación" descripcion="Artículos, capítulos, libros y ponencias de los cuerpos académicos de la Red CAENN, con DOI, ISBN o enlace, cita APA y datos descargables.">
+  <div class="contenedor">
+    <header class="encabezado-pagina">
+      <h1>Repositorio de investigación</h1>
+      <p class="intro">Productos académicos de los cuerpos académicos de la Red: artículos, capítulos, libros y ponencias. Cada uno tiene enlace permanente, cita en formato APA y las escuelas normales que participaron.</p>
+    </header>
+
+    <Filtros
+      lista="lista-productos"
+      archivo="productos"
+      total={productos.length}
+      sustantivo={['producto', 'productos']}
+      tabla={tablaProductos()}
+      filtros={[
+        { nombre: 'normal', etiqueta: 'Normal', opciones: normales.map((n) => [n.id, n.corto]) },
+        { nombre: 'anio', etiqueta: 'Año', opciones: anios.map((a) => [a, a]) },
+        { nombre: 'tipo', etiqueta: 'Tipo', opciones: tipos },
+        { nombre: 'linea', etiqueta: 'Línea', opciones: lineas.map((l) => [l.id, l.nombre]) },
+        { nombre: 'acceso', etiqueta: 'Acceso', opciones: [['si', 'Acceso abierto'], ['no', 'Acceso restringido']] },
+      ]}
+    />
+
+    <h2 class="sr">Productos</h2>
+    <ul class="registros" id="lista-productos">
+      {productos.map((p) => <ItemProducto p={p} />)}
+    </ul>
+    {productos.length === 0 && <p class="sin-resultados">Aún no hay productos registrados.</p>}
+  </div>
+</Base>

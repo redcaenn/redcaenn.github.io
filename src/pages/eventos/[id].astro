@@ -1,0 +1,86 @@
+---
+import Base from '../../layouts/Base.astro';
+import Lateral from '../../components/Lateral.astro';
+import Normales from '../../components/Normales.astro';
+import Retirado from '../../components/Retirado.astro';
+import Video from '../../components/Video.astro';
+import Galeria from '../../components/Galeria.astro';
+import ItemDivulgacion from '../../components/ItemDivulgacion.astro';
+import { datos, retiradosDe, sitio, type Evento, type Retirado as R } from '../../lib/datos';
+import { u, marcar, etiqueta, esPendiente, rango, limpio } from '../../lib/formato';
+import { evento as ld } from '../../lib/ld';
+
+export function getStaticPaths() {
+  return [
+    ...datos().eventos.map((e) => ({ params: { id: e.id }, props: { e } })),
+    ...retiradosDe('eventos').map((r) => ({ params: { id: r.id }, props: { r } })),
+  ];
+}
+const { e, r } = Astro.props as { e?: Evento; r?: R };
+const v = (x?: string) => (x && !esPendiente(x) ? x : '');
+const lugar = e ? [e.sede, e.ciudad, e.estado, e.pais].filter(Boolean) : [];
+const pendienteVideo = e && esPendiente(e.video) && e.video !== '';
+const pendienteRelatoria = e && e.relatoria.includes('[PENDIENTE]');
+---
+{r && <Retirado r={r} seccion={['/eventos/', 'Eventos']} />}
+{e && (
+  <Base titulo={e.titulo} descripcion={v(e.descripcion) || `${limpio(e.titulo)}. ${rango(e.fecha_inicio, e.fecha_fin)}.`} jsonld={ld(e)}>
+    <div class="contenedor">
+      <p class="migas">
+        {e.serie ? <a href={u('/seminario/')}>Seminario Latinoamericano</a> : <a href={u('/eventos/')}>Eventos</a>} / {e.id}
+      </p>
+      <header class="encabezado-pagina">
+        <p class="registro-cabeza">
+          {e.serie && e.sesion ? `Sesión ${e.sesion} del Seminario Latinoamericano` : etiqueta('tipoEvento', e.tipo)}
+          {' · '}<time datetime={v(e.fecha_inicio) || undefined}>{rango(e.fecha_inicio, e.fecha_fin)}</time>
+        </p>
+        <h1 set:html={marcar(e.titulo)} />
+        <Normales normales={e.normalesR} />
+      </header>
+
+      <div class="ficha">
+        <div>
+          {e.nota && <div class="aviso"><p set:html={marcar(e.nota)} /></div>}
+          {e.descripcion && <p set:html={marcar(e.descripcion)} />}
+
+          {e.videoId && <Video id={e.videoId} titulo={limpio(e.titulo)} />}
+
+          <dl class="datos">
+            <dt>Fecha</dt><dd>{rango(e.fecha_inicio, e.fecha_fin)}</dd>
+            <dt>Sede</dt><dd set:html={lugar.map(marcar).join(', ') || '—'} />
+            {e.modalidad && <><dt>Modalidad</dt><dd set:html={esPendiente(e.modalidad) ? marcar(e.modalidad) : etiqueta('modalidad', e.modalidad)} /></>}
+            <dt>Escuelas normales</dt>
+            <dd>
+              {e.normalesR.map((n, i) => <>{i > 0 && ', '}<a href={u(n.ruta)}>{n.nombre}</a></>)}
+              {e.faltanNormales && <> <mark class="marca marca-pendiente">Pendiente</mark></>}
+            </dd>
+            {e.instituciones_l.length > 0 && <><dt>Otras instituciones</dt><dd><ul>{e.instituciones_l.map((i) => <li>{i}</li>)}</ul></dd></>}
+            {e.personasR.length > 0 && <><dt>Participantes</dt><dd><ul>{e.personasR.map((p) => <li><a href={u(p.ruta)} set:html={marcar(p.nombreCompleto)} />{p.institucion && ` (${p.institucion})`}</li>)}</ul></dd></>}
+            {e.invitados_l.length > 0 && <><dt>Invitados especiales</dt><dd><ul>{e.invitados_l.map((i) => <li>{i}</li>)}</ul></dd></>}
+            {pendienteVideo && <><dt>Video</dt><dd><mark class="marca marca-pendiente">Pendiente</mark></dd></>}
+            {pendienteRelatoria && <><dt>Relatoría</dt><dd><mark class="marca marca-pendiente">Pendiente</mark></dd></>}
+          </dl>
+
+          {e.fotos.length > 0 && (
+            <section aria-labelledby="fotos-t">
+              <h2 id="fotos-t">Fotos</h2>
+              <Galeria fotos={e.fotos} />
+            </section>
+          )}
+
+          {e.divulgacionR.length > 0 && (
+            <section aria-labelledby="div-t">
+              <h2 id="div-t">Difusión de este evento</h2>
+              <ul class="registros">{e.divulgacionR.map((d) => <ItemDivulgacion d={d} />)}</ul>
+            </section>
+          )}
+        </div>
+        <Lateral ruta={e.ruta} id={e.id} alta={e.alta} actualizado={e.actualizado}>
+          {v(e.relatoria) && <p><a class="boton" href={u(`/documentos/eventos/${e.relatoria}`)}>Relatoría (PDF)</a></p>}
+          {v(e.programa) && <p><a href={u(`/documentos/eventos/${e.programa}`)}>Programa (PDF)</a></p>}
+          {e.serie && <p><a href={u('/seminario/')}>Todas las sesiones del Seminario</a></p>}
+        </Lateral>
+      </div>
+    </div>
+  </Base>
+)}

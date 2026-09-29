@@ -1,0 +1,101 @@
+---
+import Base from '../layouts/Base.astro';
+import ItemEvento from '../components/ItemEvento.astro';
+import { datos, sitio } from '../lib/datos';
+import { u, marcar, fecha, rango, claveFecha, hoyISO, etiqueta, plural } from '../lib/formato';
+import { organizacion } from '../lib/ld';
+
+const { normales, productos, eventos, acuerdos, divulgacion } = datos();
+const estados = new Set(normales.map((n) => n.estado));
+const hoy = hoyISO();
+const proximos = eventos
+  .filter((e) => {
+    const f = claveFecha(e.fecha_fin || e.fecha_inicio);
+    return f && f >= hoy.slice(0, f.length);
+  })
+  .reverse()
+  .slice(0, 3);
+const sesiones = eventos.filter((e) => e.serie && e.sesion).length;
+
+const entradas = [
+  { ruta: '/repositorio/', titulo: 'Repositorio de investigación', texto: 'Artículos, capítulos, libros y ponencias.', n: plural(productos.length, 'producto', 'productos') },
+  { ruta: '/seminario/', titulo: 'Seminario Latinoamericano', texto: 'Saberes, redes y comunidad: diálogos sobre la formación docente.', n: plural(sesiones, 'sesión', 'sesiones') },
+  { ruta: '/vinculacion/', titulo: 'Vinculación', texto: 'Acuerdos y cartas compromiso con otras instituciones.', n: plural(acuerdos.length, 'acuerdo', 'acuerdos') },
+  { ruta: '/divulgacion/', titulo: 'Divulgación', texto: 'Publicaciones en redes sociales y notas de prensa.', n: plural(divulgacion.length, 'publicación', 'publicaciones') },
+];
+
+// Lo más reciente: todo lo que ya tiene fecha, del más nuevo al más viejo
+const recientes = [
+  ...eventos.map((e) => ({ f: e.fecha_inicio, tipo: 'Evento', titulo: e.titulo, ruta: e.ruta, cuando: rango(e.fecha_inicio, e.fecha_fin) })),
+  ...acuerdos.map((a) => ({ f: a.fecha, tipo: 'Acuerdo', titulo: a.titulo, ruta: a.ruta, cuando: fecha(a.fecha) })),
+  ...divulgacion.map((d) => ({ f: d.fecha, tipo: etiqueta('tipoDivulgacion', d.tipo), titulo: d.titulo, ruta: d.ruta, cuando: fecha(d.fecha) })),
+]
+  .filter((x) => claveFecha(x.f) && claveFecha(x.f) <= hoy)
+  .sort((a, b) => claveFecha(b.f).localeCompare(claveFecha(a.f)))
+  .slice(0, 5);
+---
+<Base titulo={sitio.nombre_corto} jsonld={organizacion()}>
+  <section class="portada">
+    <div class="contenedor portada-rejilla">
+      <div>
+        <h1>{sitio.nombre}</h1>
+        <p class="portada-dato">{normales.length} escuelas normales · {estados.size} estados del noroeste de México · desde {sitio.fundacion}</p>
+      </div>
+      <img class="portada-mapa" src={u('/mapa-noroeste.webp')} width="560" height="451" alt="" />
+    </div>
+  </section>
+
+  <div class="contenedor">
+    <nav class="entradas" aria-label="Secciones del expediente">
+      {entradas.map((x) => (
+        <a class="entrada" href={u(x.ruta)}>
+          <span class="entrada-titulo">{x.titulo}</span>
+          <span class="entrada-texto">{x.texto}</span>
+          <span class="entrada-n">{x.n} →</span>
+        </a>
+      ))}
+    </nav>
+
+    {proximos.length > 0 && (
+      <section aria-labelledby="proximos-t">
+        <h2 id="proximos-t">Próximos eventos</h2>
+        <ul class="registros">{proximos.map((e) => <ItemEvento e={e} />)}</ul>
+      </section>
+    )}
+
+    <section aria-labelledby="recientes-t">
+      <h2 id="recientes-t">Lo más reciente</h2>
+      <ul class="recientes">
+        {recientes.map((x) => (
+          <li>
+            <span class="recientes-cuando"><time datetime={x.f}>{x.cuando}</time> · {x.tipo}</span>
+            <a href={u(x.ruta)} set:html={marcar(x.titulo)} />
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section aria-labelledby="red-t" class="sobre">
+      <div>
+        <h2 id="red-t">Sobre la Red</h2>
+        <p>{sitio.textos.presentacion}</p>
+        <p class="sobre-acciones">
+          <a class="boton" href={u('/registro/')}>Registrarse en la Red</a>
+        </p>
+      </div>
+      <aside class="sobre-normales" aria-labelledby="integran-t">
+        <h3 id="integran-t">Escuelas normales de la Red</h3>
+        <dl>
+          {[...estados].map((estado) => (
+            <>
+              <dt>{estado}</dt>
+              {normales.filter((n) => n.estado === estado).map((n) => (
+                <dd><a href={u(n.ruta)}>{n.nombre}</a></dd>
+              ))}
+            </>
+          ))}
+        </dl>
+      </aside>
+    </section>
+  </div>
+</Base>

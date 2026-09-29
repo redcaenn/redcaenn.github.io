@@ -1,0 +1,12 @@
+id,grado,nombres,apellidos,normal,institucion,cargo_red,orcid
+ortiz-macias-catalina,Dra.,Catalina G.,Ortiz Macias,enft,,Coordinadora General,
+lopez-ruiz-laura,Dra.,Laura Veronica,López Ruiz,[PENDIENTE],,Coordinadora Nodo Baja California,
+rubio-moreno-mireya,Dra.,Mireya,Rubio Moreno,[PENDIENTE],,Coordinadora Nodo Sinaloa,
+viramontes-anaya-efren,Dr.,Efrén,Viramontes Anaya,[PENDIENTE],,Coordinador Nodo Chihuahua,
+soto-medina-yazmin,Dra.,Yazmin Guadalupe,Soto Medina,[PENDIENTE],,Coordinadora Nodo Sonora,
+garcia-velarde-alfredo,Dr.,Alfredo,García Velarde,[PENDIENTE],,Coordinador Nodo Baja California Sur,
+de-la-cruz-gabriela,Dra.,Gabriela,de la Cruz,,IISUE-UNAM,Coordinación general del Seminario Latinoamericano,
+suarez-daniel-hugo,Dr.,Daniel Hugo,Suárez,,"Instituto de Investigaciones en Ciencias de la Educación, Universidad de Buenos Aires",,
+ejemplo-ana,Dra.,[EJEMPLO] Ana,Ejemplo Uno,enft,,,
+ejemplo-beto,Mtro.,[EJEMPLO] Beto,Ejemplo Dos,ens,,,
+ejemplo-carla,Dra.,[EJEMPLO] Carla,Ejemplo Tres,bycenes,,,

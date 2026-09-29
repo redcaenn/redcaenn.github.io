@@ -1,0 +1,123 @@
+---
+// Filtros de una lista de registros + exportación a CSV de lo que se ve.
+// Sin JavaScript, la lista completa se muestra igual y el formulario queda oculto por CSS (clase .js en <html>),
+// así el formulario ya está en su lugar desde el primer dibujo y la lista no se recorre.
+import type { Tabla } from '../lib/exportar';
+import { u } from '../lib/formato';
+
+interface Filtro {
+  nombre: string; // coincide con data-f-<nombre> en cada renglón
+  etiqueta: string;
+  opciones: [string, string][];
+}
+interface Props {
+  lista: string; // id del <ul> filtrado
+  filtros: Filtro[];
+  tabla: Tabla;
+  archivo: string; // nombre de la tabla para /datos/<archivo>.csv
+  total: number;
+  sustantivo: [string, string];
+}
+const { lista, filtros, tabla, archivo, total, sustantivo } = Astro.props;
+const conOpciones = filtros.filter((f) => f.opciones.length > 0);
+const visibles = conOpciones.slice(0, 3);
+const extra = conOpciones.slice(3);
+---
+<form class="filtros" data-filtros data-lista={lista} data-archivo={archivo} data-uno={sustantivo[0]} data-varios={sustantivo[1]} role="search" aria-label="Filtrar">
+  <div class="filtros-fila">
+    <div class="filtro-buscar">
+      <label for={`${lista}-q`} class="sr">Buscar</label>
+      <input id={`${lista}-q`} name="q" type="search" placeholder="Buscar por título, autor o medio" autocomplete="off" />
+    </div>
+    {visibles.map((f) => (
+      <div>
+        <label for={`${lista}-${f.nombre}`} class="sr">{f.etiqueta}</label>
+        <select id={`${lista}-${f.nombre}`} name={f.nombre}>
+          <option value="">{f.etiqueta}</option>
+          {f.opciones.map(([v, t]) => <option value={v}>{t}</option>)}
+        </select>
+      </div>
+    ))}
+  </div>
+  {extra.length > 0 && (
+    <details class="mas-filtros">
+      <summary>Más filtros</summary>
+      <div class="filtros-fila">
+        {extra.map((f) => (
+          <div>
+            <label for={`${lista}-${f.nombre}`} class="sr">{f.etiqueta}</label>
+            <select id={`${lista}-${f.nombre}`} name={f.nombre}>
+              <option value="">{f.etiqueta}</option>
+              {f.opciones.map(([v, t]) => <option value={v}>{t}</option>)}
+            </select>
+          </div>
+        ))}
+      </div>
+    </details>
+  )}
+  <p class="filtros-pie">
+    <span class="conteo" aria-live="polite" data-conteo>{total} {total === 1 ? sustantivo[0] : sustantivo[1]}</span>
+    <button type="reset" class="enlace-boton">Quitar filtros</button>
+    <span class="descargas">Descargar en Excel (CSV): <button type="button" class="enlace-boton" data-exportar>lo que se ve</button> · <a href={u(`/datos/${archivo}.csv`)} download>todo</a></span>
+  </p>
+</form>
+<noscript><p><a href={u(`/datos/${archivo}.csv`)}>Descargar todo en CSV</a></p></noscript>
+<script type="application/json" data-tabla={lista} set:html={JSON.stringify(tabla)} />
+
+<script>
+  const sinAcentos = (t: string) => t.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
+
+  document.querySelectorAll<HTMLFormElement>('form[data-filtros]').forEach((form) => {
+    const lista = document.getElementById(form.dataset.lista!);
+    if (!lista) return;
+    const items = [...lista.querySelectorAll<HTMLElement>('[data-id]')];
+    items.forEach((li) => (li.dataset.buscar = sinAcentos(li.dataset.buscar ?? '')));
+    const conteo = form.querySelector('[data-conteo]')!;
+    const vacio = document.createElement('p');
+    vacio.className = 'sin-resultados';
+    vacio.textContent = 'Ningún registro coincide con los filtros.';
+    vacio.hidden = true;
+    (lista.closest(".tabla-envoltura") ?? lista).after(vacio);
+
+    const campos = [...form.elements].filter((el): el is HTMLInputElement | HTMLSelectElement => 'name' in el && !!(el as HTMLInputElement).name);
+    const params = new URLSearchParams(location.search);
+    campos.forEach((c) => params.has(c.name) && (c.value = params.get(c.name)!));
+
+    function aplicar() {
+      let n = 0;
+      const q = sinAcentos((form.elements.namedItem('q') as HTMLInputElement).value.trim());
+      for (const li of items) {
+        let ok = !q || q.split(/\s+/).every((p) => li.dataset.buscar!.includes(p));
+        for (const c of campos) {
+          if (c.name === 'q' || !c.value || !ok) continue;
+          const clave = 'f' + c.name[0].toUpperCase() + c.name.slice(1);
+          ok = (li.dataset[clave] ?? '').split(' ').includes(c.value);
+        }
+        li.hidden = !ok;
+        if (ok) n++;
+      }
+      conteo.textContent = `${n} ${n === 1 ? form.dataset.uno : form.dataset.varios}`;
+      vacio.hidden = n > 0;
+      const p = new URLSearchParams();
+      campos.forEach((c) => c.value && p.set(c.name, c.value));
+      history.replaceState(null, '', p.size ? `?${p}` : location.pathname);
+    }
+    form.addEventListener('input', aplicar);
+    form.addEventListener('reset', () => setTimeout(aplicar));
+    form.addEventListener('submit', (e) => e.preventDefault());
+    aplicar();
+
+    form.querySelector('[data-exportar]')?.addEventListener('click', () => {
+      const datos = JSON.parse(document.querySelector(`[data-tabla="${form.dataset.lista}"]`)!.textContent!);
+      const celda = (v: string) => (/[",\n;]/.test(v ?? '') ? `"${String(v).replace(/"/g, '""')}"` : (v ?? ''));
+      const filas = items.filter((li) => !li.hidden).map((li) => datos.filas[li.dataset.id!]).filter(Boolean);
+      const csv = '﻿' + [datos.columnas, ...filas].map((f: string[]) => f.map(celda).join(',')).join('\r\n') + '\r\n';
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+      const hoy = new Date().toISOString().slice(0, 10);
+      a.download = `redcaenn-${form.dataset.archivo}-${hoy}.csv`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+  });
+</script>

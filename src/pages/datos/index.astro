@@ -1,0 +1,26 @@
+---
+import Base from '../../layouts/Base.astro';
+import { TABLAS_EXPORTABLES } from '../../lib/exportar';
+import { u, hoyISO, fecha } from '../../lib/formato';
+const tablas = Object.entries(TABLAS_EXPORTABLES).map(([k, t]) => ({ k, titulo: t.titulo, n: Object.keys(t.tabla().filas).length }));
+---
+<Base titulo="Datos abiertos" descripcion="Descarga en CSV de todos los productos, eventos, acuerdos y publicaciones de divulgación de la Red CAENN.">
+  <div class="contenedor">
+    <header class="encabezado-pagina">
+      <h1>Datos abiertos</h1>
+      <p class="intro">Todo el expediente de la Red en archivos CSV que se abren en Excel o Google Sheets. Cada fila incluye su enlace permanente y sus fechas de publicación y de actualización en este sitio.</p>
+    </header>
+    <div class="tabla-envoltura">
+      <table>
+        <caption class="sr">Archivos disponibles</caption>
+        <thead><tr><th scope="col">Conjunto</th><th scope="col">Registros</th><th scope="col">Archivo</th></tr></thead>
+        <tbody>
+          {tablas.map((t) => (
+            <tr><td>{t.titulo}</td><td>{t.n}</td><td><a href={u(`/datos/${t.k}.csv`)} download>{t.k}.csv</a></td></tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p class="meta" style="margin-top:1rem">Generado el {fecha(hoyISO())}. Codificación UTF-8, separado por comas.</p>
+  </div>
+</Base>

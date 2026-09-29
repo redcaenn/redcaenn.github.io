@@ -1,0 +1,72 @@
+{
+  "_instrucciones": "Datos generales del sitio. Los textos oficiales se copian tal cual; lo que falte se marca [PENDIENTE].",
+  "nombre": "Red de Cuerpos Académicos de Escuelas Normales del Noroeste",
+  "nombre_corto": "Red CAENN",
+  "fundacion": 2021,
+  "url": "https://redcaenn.com",
+  "correo": "[PENDIENTE]",
+  "formulario_registro": "https://forms.gle/E4xr9Vhm2tyXS7sJ8",
+  "redes_confirmadas": false,
+  "redes": {
+    "facebook": "https://www.facebook.com/redcaenn",
+    "instagram": "https://www.instagram.com/redcaenn",
+    "youtube": "https://www.youtube.com/@redcaenn",
+    "whatsapp": "[PENDIENTE]"
+  },
+  "textos": {
+    "presentacion": "La Red de Cuerpos Académicos de Escuelas Normales del Noroeste (CAENN), constituida en 2021, reúne el trabajo cooperativo y colaborativo de docentes investigadores e investigadoras de Escuelas Normales representativas del noroeste de México, con el objetivo de atender las necesidades de formación en investigación educativa que prevalecen en la región, a través de la creación interinstitucional de programas de posgrado, así como la vinculación con otras instituciones de educación superior, redes y centros de investigación, nacionales e internacionales, que aporten a la formación investigativa y a la generación y difusión del conocimiento en el campo de la educación.",
+    "acuerdos_intro": "Los avances de la Red CAENN se han ido consolidando por medio del trabajo comprometido y permanente de las y los docentes de los cuerpos académicos que la integran, y también, de manera importante, a través de los diferentes acuerdos de colaboración que se han firmado entre las escuelas normales y cuerpos académicos del noroeste que conforman la Red CAENN, así como entre la Red e instituciones educativas y de investigación nacionales e internacionales:",
+    "registro": "Iniciar registro en el siguiente enlace:"
+  },
+  "seminario": {
+    "nombre": "Seminario Virtual Latinoamericano Saberes, redes y comunidad: Diálogos sobre la formación docente",
+    "etapa": "Etapa 2025–2026",
+    "objetivo": "El Seminario busca generar un espacio colaborativo que articule investigación, narrativas docentes y redes académicas. Además de los diálogos y sesiones, se proyecta como resultado central una obra editorial colectiva que servirá de memoria viva del proceso. Tanto cuerpo académicos como redes participantes escribirán a través de este proceso de seminario, los capítulos de la obra colectiva. Sin embargo, otros trabajos complementarios que podran derivarse de nuestro esfuerzo colaborativo son : podcasts, entrevistas, cartografías narrativas y memoria audiovisual.",
+    "participan": [
+      "Red CAENN e IISUE (Coordinación general)",
+      "Red Nacional de Narradores Normalistas",
+      "Red de Escuelas Normales del Noroeste de Argentina",
+      "Red Latinoamericana de Posgrados",
+      "Red de posgrado en Educación en Latinoamérica (REDPEEL)"
+    ],
+    "coordinacion": [
+      "Dra. Catalina Guadalupe Ortiz Macías (CAENN)",
+      "Dra. Gabriela de la Cruz (IISUE-UNAM)"
+    ],
+    "cronograma": [
+      {
+        "fecha": "2025-10",
+        "texto": "Sesión inaugural del seminario."
+      },
+      {
+        "fecha": "2025-10",
+        "hasta": "2026-09",
+        "texto": "10 sesiones mensuales."
+      },
+      {
+        "fecha": "2026-05",
+        "texto": "Entrega de avances de capítulos."
+      },
+      {
+        "fecha": "2026-08",
+        "texto": "Cierre definitivo de recepción de capítulos."
+      },
+      {
+        "fecha": "2026-09",
+        "texto": "Edición final y dictaminación."
+      },
+      {
+        "fecha": "2026-10",
+        "texto": "Presentación pública del primer tomo."
+      }
+    ],
+    "programa": "programa-seminario-latinoamericano-2025-2026.pdf",
+    "productos_previstos": [
+      "Obra editorial colectiva",
+      "Podcasts",
+      "Entrevistas",
+      "Cartografías narrativas",
+      "Memoria audiovisual"
+    ]
+  }
+}

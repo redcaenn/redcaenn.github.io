@@ -1,0 +1,62 @@
+---
+import Base from '../../layouts/Base.astro';
+import Lateral from '../../components/Lateral.astro';
+import Normales from '../../components/Normales.astro';
+import Retirado from '../../components/Retirado.astro';
+import Galeria from '../../components/Galeria.astro';
+import { datos, retiradosDe, type Acuerdo, type Retirado as R } from '../../lib/datos';
+import { u, marcar, etiqueta, esPendiente, fecha } from '../../lib/formato';
+import { acuerdo as ld } from '../../lib/ld';
+
+export function getStaticPaths() {
+  return [
+    ...datos().acuerdos.map((a) => ({ params: { id: a.id }, props: { a } })),
+    ...retiradosDe('acuerdos').map((r) => ({ params: { id: r.id }, props: { r } })),
+  ];
+}
+const { a, r } = Astro.props as { a?: Acuerdo; r?: R };
+const v = (x?: string) => (x && !esPendiente(x) ? x : '');
+---
+{r && <Retirado r={r} seccion={['/vinculacion/', 'Vinculación']} />}
+{a && (
+  <Base titulo={a.titulo} descripcion={a.descripcion} jsonld={ld(a)}>
+    <div class="contenedor">
+      <p class="migas"><a href={u('/vinculacion/')}>Vinculación</a> / {a.id}</p>
+      <header class="encabezado-pagina">
+        <p class="registro-cabeza">{etiqueta('tipoAcuerdo', a.tipo)} · <time datetime={v(a.fecha) || undefined}>{fecha(a.fecha)}</time></p>
+        <h1 set:html={marcar(a.titulo)} />
+        <Normales normales={a.normalesR} />
+      </header>
+      <div class="ficha">
+        <div>
+          {a.descripcion && <p set:html={marcar(a.descripcion)} />}
+          {a.nota && <div class="aviso"><p set:html={marcar(a.nota)} /></div>}
+          <dl class="datos">
+            <dt>Fecha de firma</dt><dd>{fecha(a.fecha)}</dd>
+            {a.lugar && <><dt>Lugar</dt><dd set:html={marcar(a.lugar)} /></>}
+            <dt>Tipo</dt><dd>{etiqueta('tipoAcuerdo', a.tipo)}</dd>
+            {a.instituciones_l.length > 0 && <><dt>Instituciones</dt><dd><ul>{a.instituciones_l.map((i) => <li>{i}</li>)}</ul></dd></>}
+            <dt>Escuelas normales</dt>
+            <dd>
+              {a.normalesR.map((n, i) => <>{i > 0 && ', '}<a href={u(n.ruta)}>{n.nombre}</a></>)}
+              {a.faltanNormales && <> <mark class="marca marca-pendiente">Pendiente</mark></>}
+            </dd>
+            {a.personasR.length > 0 && <><dt>Firmantes</dt><dd><ul>{a.personasR.map((p) => <li><a href={u(p.ruta)} set:html={marcar(p.nombreCompleto)} /></li>)}</ul></dd></>}
+            {a.vigencia && <><dt>Vigencia</dt><dd set:html={marcar(a.vigencia)} /></>}
+            <dt>Documento</dt>
+            <dd>{v(a.pdf) ? <a href={u(`/documentos/acuerdos/${a.pdf}`)}>Documento firmado (PDF)</a> : <mark class="marca marca-pendiente">PDF pendiente</mark>}</dd>
+          </dl>
+          {a.fotos.length > 0 && (
+            <section aria-labelledby="fotos-t">
+              <h2 id="fotos-t">Fotos de la firma</h2>
+              <Galeria fotos={a.fotos} />
+            </section>
+          )}
+        </div>
+        <Lateral ruta={a.ruta} id={a.id} alta={a.alta} actualizado={a.actualizado}>
+          {v(a.pdf) && <p><a class="boton" href={u(`/documentos/acuerdos/${a.pdf}`)}>Descargar PDF</a></p>}
+        </Lateral>
+      </div>
+    </div>
+  </Base>
+)}

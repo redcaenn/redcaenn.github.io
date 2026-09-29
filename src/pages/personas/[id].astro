@@ -1,0 +1,56 @@
+---
+import Base from '../../layouts/Base.astro';
+import Lateral from '../../components/Lateral.astro';
+import Retirado from '../../components/Retirado.astro';
+import ItemProducto from '../../components/ItemProducto.astro';
+import ItemEvento from '../../components/ItemEvento.astro';
+import ItemAcuerdo from '../../components/ItemAcuerdo.astro';
+import ItemDivulgacion from '../../components/ItemDivulgacion.astro';
+import { datos, evidenciaDe, retiradosDe, type Persona, type Retirado as R } from '../../lib/datos';
+import { u, marcar, esPendiente, limpio, plural } from '../../lib/formato';
+import { persona as ldPersona } from '../../lib/ld';
+
+export function getStaticPaths() {
+  const { personas } = datos();
+  return [
+    ...personas.map((p) => ({ params: { id: p.id }, props: { p } })),
+    ...retiradosDe('personas').map((r) => ({ params: { id: r.id }, props: { r } })),
+  ];
+}
+const { p, r } = Astro.props as { p?: Persona; r?: R };
+const ev = p ? evidenciaDe({ persona: p.id }) : null;
+---
+{r && <Retirado r={r} seccion={['/normales/', 'Normales']} />}
+{p && ev && (
+  <Base titulo={p.nombreCompleto} descripcion={`${limpio(p.nombreCompleto)}${p.cargo_red ? `, ${p.cargo_red}` : ''}. Productos, eventos y divulgación registrados en la Red CAENN.`} jsonld={{ '@context': 'https://schema.org', ...ldPersona(p) }}>
+    <div class="contenedor">
+      <p class="migas"><a href={u('/normales/')}>Normales</a> / {p.normalR ? <a href={u(p.normalR.ruta)}>{p.normalR.corto}</a> : 'Personas'}</p>
+      <header class="encabezado-pagina">
+        <h1 set:html={marcar(p.nombreCompleto)} />
+        {p.cargo_red && <p class="intro">{p.cargo_red}</p>}
+      </header>
+      <div class="ficha">
+        <div>
+          <dl class="datos">
+            <dt>Adscripción</dt>
+            <dd>
+              {p.normalR ? <a href={u(p.normalR.ruta)}>{p.normalR.nombre}</a> : p.institucion ? p.institucion : ''}
+              {esPendiente(p.normal) && p.normal && <mark class="marca marca-pendiente">Pendiente</mark>}
+            </dd>
+            {p.orcid && !esPendiente(p.orcid) && <><dt>ORCID</dt><dd><a href={`https://orcid.org/${p.orcid}`} rel="noopener">{p.orcid}</a></dd></>}
+            <dt>Evidencia registrada</dt>
+            <dd>
+              {plural(ev.productos.length, 'producto', 'productos')} · {plural(ev.eventos.length, 'evento', 'eventos')} ·{' '}
+              {plural(ev.acuerdos.length, 'acuerdo', 'acuerdos')} · {plural(ev.divulgacion.length, 'publicación de divulgación', 'publicaciones de divulgación')}
+            </dd>
+          </dl>
+          {ev.productos.length > 0 && <section><h2>Productos</h2><ul class="registros">{ev.productos.map((x) => <ItemProducto p={x} />)}</ul></section>}
+          {ev.eventos.length > 0 && <section><h2>Eventos</h2><ul class="registros">{ev.eventos.map((x) => <ItemEvento e={x} />)}</ul></section>}
+          {ev.acuerdos.length > 0 && <section><h2>Acuerdos</h2><ul class="registros">{ev.acuerdos.map((x) => <ItemAcuerdo a={x} />)}</ul></section>}
+          {ev.divulgacion.length > 0 && <section><h2>Divulgación</h2><ul class="registros">{ev.divulgacion.map((x) => <ItemDivulgacion d={x} />)}</ul></section>}
+        </div>
+        <Lateral ruta={p.ruta} id={p.id} alta={p.alta} actualizado={p.actualizado} />
+      </div>
+    </div>
+  </Base>
+)}

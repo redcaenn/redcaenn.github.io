@@ -1,0 +1,73 @@
+# Lee la hoja de Google una vez al día y, si hay cambios, abre una propuesta
+# de cambios (pull request) para revisarla antes de publicar. Nada se publica solo.
+name: Sincronizar desde Google Sheets
+
+on:
+  schedule:
+    - cron: '0 14 * * *' # 7:00 en Tijuana / 8:00 en Ciudad de México
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sincronizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      - name: Descargar la hoja
+        run: npm run sheets
+        env:
+          GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+
+      - name: Revisar los datos
+        id: revisar
+        run: |
+          set +e
+          npm run --silent validar > revision.txt 2>&1
+          echo "estado=$?" >> "$GITHUB_OUTPUT"
+          cat revision.txt
+
+      - name: Abrir o actualizar la propuesta de cambios
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet -- datos; then
+            echo "La hoja no tiene cambios."
+            exit 0
+          fi
+          rama=sincronizacion-sheets
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$rama"
+          git add datos
+          git commit -m "Datos: cambios de la hoja de Google ($(date +%F))"
+          git push --force origin "$rama"
+
+          if [ "${{ steps.revisar.outputs.estado }}" = "0" ]; then
+            titulo="Cambios de la hoja de Google para revisar"
+            estado="Los datos pasaron la revisión. Revisa los cambios en la pestaña **Files changed** y, si todo está bien, presiona **Merge** para publicarlos."
+          else
+            titulo="⚠️ Cambios de la hoja de Google con errores"
+            estado="**Hay errores que impiden publicar.** Corrígelos en la hoja; mañana (o al volver a correr la sincronización) esta propuesta se actualiza sola."
+          fi
+          {
+            echo "$estado"
+            echo
+            echo '```'
+            cat revision.txt
+            echo '```'
+          } > cuerpo.md
+          if gh pr view "$rama" --json state -q .state 2>/dev/null | grep -q OPEN; then
+            gh pr edit "$rama" --title "$titulo" --body-file cuerpo.md
+          else
+            gh pr create --base main --head "$rama" --title "$titulo" --body-file cuerpo.md
+          fi

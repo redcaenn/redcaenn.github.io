@@ -1,0 +1,16 @@
+---
+import Base from '../layouts/Base.astro';
+import { sitio } from '../lib/datos';
+---
+<Base titulo="Registro" descripcion="Registro de cuerpos académicos y grupos de investigación de escuelas normales a la Red CAENN.">
+  <div class="contenedor">
+    <header class="encabezado-pagina">
+      <h1>Registro</h1>
+    </header>
+    <section class="tarjeta registro-tarjeta" aria-label="Formulario de registro">
+      <p>{sitio.textos.registro}</p>
+      <p><a class="boton" href={sitio.formulario_registro} rel="noopener">Abrir el formulario de registro<span class="sr"> (Google Forms, sitio externo)</span></a></p>
+      <p class="registro-url">{sitio.formulario_registro}</p>
+    </section>
+  </div>
+</Base>

@@ -1,0 +1,24 @@
+---
+// Video de YouTube que solo se carga al hacer clic (sin cookies hasta entonces).
+interface Props { id: string; titulo: string }
+const { id, titulo } = Astro.props;
+---
+<div class="video" data-video={id}>
+  <button type="button" aria-label={`Reproducir el video: ${titulo}`}>
+    <img src={`https://i.ytimg.com/vi/${id}/hqdefault.jpg`} alt="" loading="lazy" width="480" height="360" />
+    <span class="play" aria-hidden="true">▶ Reproducir video</span>
+  </button>
+</div>
+<p><a href={`https://www.youtube.com/watch?v=${id}`} rel="noopener">Ver en YouTube<span class="sr"> (sitio externo)</span></a></p>
+<script>
+  document.querySelectorAll<HTMLElement>('[data-video]').forEach((c) => {
+    c.querySelector('button')?.addEventListener('click', () => {
+      const f = document.createElement('iframe');
+      f.src = `https://www.youtube-nocookie.com/embed/${c.dataset.video}?autoplay=1`;
+      f.title = c.querySelector('button')?.getAttribute('aria-label') ?? 'Video';
+      f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+      f.allowFullscreen = true;
+      c.replaceChildren(f);
+    });
+  });
+</script>

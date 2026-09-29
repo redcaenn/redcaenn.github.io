@@ -1,0 +1,48 @@
+---
+import Base from '../../layouts/Base.astro';
+import Lateral from '../../components/Lateral.astro';
+import Normales from '../../components/Normales.astro';
+import Retirado from '../../components/Retirado.astro';
+import { datos, retiradosDe, type Divulgacion, type Retirado as R } from '../../lib/datos';
+import { u, marcar, etiqueta, esPendiente, fecha, limpio } from '../../lib/formato';
+import { divulgacion as ld } from '../../lib/ld';
+
+export function getStaticPaths() {
+  return [
+    ...datos().divulgacion.map((d) => ({ params: { id: d.id }, props: { d } })),
+    ...retiradosDe('divulgacion').map((r) => ({ params: { id: r.id }, props: { r } })),
+  ];
+}
+const { d, r } = Astro.props as { d?: Divulgacion; r?: R };
+---
+{r && <Retirado r={r} seccion={['/divulgacion/', 'Divulgación']} />}
+{d && (
+  <Base titulo={d.titulo} descripcion={`${etiqueta('tipoDivulgacion', d.tipo)} en ${etiqueta('red', d.red)}${d.medio ? ` (${limpio(d.medio)})` : ''}: ${limpio(d.titulo)}`} tipoOG="article" jsonld={ld(d)}>
+    <div class="contenedor">
+      <p class="migas"><a href={u('/divulgacion/')}>Divulgación</a> / {d.id}</p>
+      <header class="encabezado-pagina">
+        <p class="registro-cabeza">
+          {etiqueta('tipoDivulgacion', d.tipo)} · {etiqueta('red', d.red)} ·{' '}
+          {esPendiente(d.fecha) ? <mark class="marca marca-pendiente">Fecha pendiente</mark> : <time datetime={d.fecha}>{fecha(d.fecha)}</time>}
+        </p>
+        <h1 set:html={marcar(d.titulo)} />
+        <Normales normales={d.normalesR} />
+      </header>
+      <div class="ficha">
+        <div>
+          <p class="acciones"><a class="boton" href={d.url} rel="noopener">Ver publicación original<span class="sr"> (sitio externo)</span></a></p>
+          <dl class="datos">
+            <dt>Fecha</dt><dd set:html={esPendiente(d.fecha) ? marcar(d.fecha) : fecha(d.fecha)} />
+            <dt>Red o medio</dt><dd>{etiqueta('red', d.red)}{d.medio && <span set:html={` · ${marcar(d.medio)}`} />}</dd>
+            <dt>Enlace original</dt><dd><a href={d.url} rel="noopener">{d.url}</a></dd>
+            {d.serie && <><dt>Serie</dt><dd set:html={marcar(d.serie)} /></>}
+            {d.personasR.length > 0 && <><dt>Personas</dt><dd><ul>{d.personasR.map((p) => <li><a href={u(p.ruta)} set:html={marcar(p.nombreCompleto)} />{p.normalR && ` (${p.normalR.corto})`}</li>)}</ul></dd></>}
+            <dt>Escuelas normales</dt><dd>{d.normalesR.length ? d.normalesR.map((n, i) => <>{i > 0 && ', '}<a href={u(n.ruta)}>{n.nombre}</a></>) : '—'}</dd>
+            {d.eventoR && <><dt>Evento</dt><dd><a href={u(d.eventoR.ruta)} set:html={marcar(d.eventoR.titulo)} /></dd></>}
+          </dl>
+        </div>
+        <Lateral ruta={d.ruta} id={d.id} alta={d.alta} actualizado={d.actualizado} />
+      </div>
+    </div>
+  </Base>
+)}

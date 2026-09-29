@@ -1,0 +1,62 @@
+---
+import Base from '../../layouts/Base.astro';
+import Lateral from '../../components/Lateral.astro';
+import Retirado from '../../components/Retirado.astro';
+import ItemProducto from '../../components/ItemProducto.astro';
+import ItemEvento from '../../components/ItemEvento.astro';
+import ItemAcuerdo from '../../components/ItemAcuerdo.astro';
+import ItemDivulgacion from '../../components/ItemDivulgacion.astro';
+import { datos, evidenciaDe, retiradosDe, type Normal, type Retirado as R } from '../../lib/datos';
+import { u, marcar, esPendiente, plural } from '../../lib/formato';
+import { normal as ldNormal } from '../../lib/ld';
+
+export function getStaticPaths() {
+  return [
+    ...datos().normales.map((n) => ({ params: { id: n.id }, props: { n } })),
+    ...retiradosDe('normales').map((r) => ({ params: { id: r.id }, props: { r } })),
+  ];
+}
+const { n, r } = Astro.props as { n?: Normal; r?: R };
+const ev = n ? evidenciaDe({ normal: n.id }) : null;
+const gente = n ? datos().personas.filter((p) => p.normal === n.id) : [];
+const colab = ev ? [...ev.productos, ...ev.eventos, ...ev.acuerdos].filter((x) => x.normalesR.length >= 2).length : 0;
+---
+{r && <Retirado r={r} seccion={['/normales/', 'Normales']} />}
+{n && ev && (
+  <Base titulo={n.nombre} descripcion={`${n.nombre} (${n.estado}), integrante de la Red CAENN: productos, eventos, acuerdos y divulgación.`} jsonld={{ '@context': 'https://schema.org', ...ldNormal(n) }}>
+    <div class="contenedor">
+      <p class="migas"><a href={u('/normales/')}>Normales</a> / {n.corto}</p>
+      <header class="encabezado-pagina">
+        <p class="registro-cabeza">{n.estado}</p>
+        <h1>{n.nombre}</h1>
+        <p class="intro">{n.siglas && `${n.siglas} · `}<span set:html={marcar(n.ciudad)} />, {n.estado}</p>
+      </header>
+      <div class="ficha">
+        <div>
+          <ul class="cifras" style="margin-top:0">
+            <li><strong>{ev.productos.length}</strong><span>productos</span></li>
+            <li><strong>{ev.eventos.length}</strong><span>eventos</span></li>
+            <li><strong>{ev.acuerdos.length}</strong><span>acuerdos</span></li>
+            <li><strong>{ev.divulgacion.length}</strong><span>publicaciones de divulgación</span></li>
+          </ul>
+          <p class="meta" style="margin-top:1rem">{plural(colab, 'registro', 'registros')} en colaboración con otras normales de la Red.</p>
+          {gente.length > 0 && (
+            <section>
+              <h2>Personas</h2>
+              <ul>{gente.map((p) => <li><a href={u(p.ruta)} set:html={marcar(p.nombreCompleto)} />{p.cargo_red && ` — ${p.cargo_red}`}</li>)}</ul>
+            </section>
+          )}
+          {ev.productos.length > 0 && <section><h2>Productos</h2><ul class="registros">{ev.productos.map((x) => <ItemProducto p={x} />)}</ul></section>}
+          {ev.eventos.length > 0 && <section><h2>Eventos</h2><ul class="registros">{ev.eventos.map((x) => <ItemEvento e={x} />)}</ul></section>}
+          {ev.acuerdos.length > 0 && <section><h2>Acuerdos</h2><ul class="registros">{ev.acuerdos.map((x) => <ItemAcuerdo a={x} />)}</ul></section>}
+          {ev.divulgacion.length > 0 && <section><h2>Divulgación</h2><ul class="registros">{ev.divulgacion.map((x) => <ItemDivulgacion d={x} />)}</ul></section>}
+        </div>
+        {(
+          <Lateral ruta={n.ruta} id={n.id} alta={n.alta} actualizado={n.actualizado}>
+            {n.sitio_web && !esPendiente(n.sitio_web) && <p><a href={n.sitio_web} rel="noopener">Sitio web de la escuela</a></p>}
+          </Lateral>
+        )}
+      </div>
+    </div>
+  </Base>
+)}

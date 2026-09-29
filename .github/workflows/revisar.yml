@@ -1,0 +1,38 @@
+# Revisa cada propuesta de cambios antes de aprobarla y guarda en ella las fechas
+# de alta y actualización de los registros nuevos (datos/_registro.json).
+name: Revisar propuesta
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  revisar:
+    runs-on: ubuntu-latest
+    # Solo propuestas hechas dentro de este repositorio (no de copias ajenas)
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Revisar los datos
+        run: npm run validar
+      - name: Construir (prueba)
+        run: npx astro build
+      - name: Guardar fechas de los registros nuevos
+        run: |
+          if ! git diff --quiet -- datos/_registro.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add datos/_registro.json
+            git commit -m "Registro de fechas actualizado"
+            git push
+          fi

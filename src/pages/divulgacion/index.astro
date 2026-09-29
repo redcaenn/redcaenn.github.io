@@ -1,0 +1,42 @@
+---
+import Base from '../../layouts/Base.astro';
+import Filtros from '../../components/Filtros.astro';
+import ItemDivulgacion from '../../components/ItemDivulgacion.astro';
+import { datos } from '../../lib/datos';
+import { tablaDivulgacion } from '../../lib/exportar';
+import { ETIQUETAS, anioDe, limpio } from '../../lib/formato';
+
+const { divulgacion, normales, personas } = datos();
+const anios = [...new Set(divulgacion.map((d) => anioDe(d.fecha)).filter(Boolean))].sort().reverse();
+const redes = Object.entries(ETIQUETAS.red).filter(([r]) => divulgacion.some((d) => d.red === r));
+const tipos = Object.entries(ETIQUETAS.tipoDivulgacion).filter(([t]) => divulgacion.some((d) => d.tipo === t));
+const series = [...new Set(divulgacion.map((d) => d.serie).filter(Boolean))].sort().map((s) => [s, limpio(s)] as [string, string]);
+const conPersonas = personas.filter((p) => divulgacion.some((d) => d.personasR.includes(p))).map((p) => [p.id, limpio(p.nombreCompleto)] as [string, string]);
+---
+<Base titulo="Divulgación" descripcion="Bitácora de todo lo publicado sobre la Red CAENN en redes sociales y medios: fecha, red, enlace, serie, escuelas normales y personas que participan.">
+  <div class="contenedor">
+    <header class="encabezado-pagina">
+      <h1>Divulgación</h1>
+      <p class="intro">Bitácora de publicaciones en redes sociales, transmisiones, podcasts y notas de prensa sobre el trabajo de la Red. Cada entrada conserva la fecha, el enlace original y a quién se atribuye.</p>
+    </header>
+    <Filtros
+      lista="lista-divulgacion"
+      archivo="divulgacion"
+      total={divulgacion.length}
+      sustantivo={['publicación', 'publicaciones']}
+      tabla={tablaDivulgacion()}
+      filtros={[
+        { nombre: 'normal', etiqueta: 'Normal', opciones: normales.map((n) => [n.id, n.corto]) },
+        { nombre: 'persona', etiqueta: 'Persona', opciones: conPersonas },
+        { nombre: 'anio', etiqueta: 'Año', opciones: anios.map((a) => [a, a]) },
+        { nombre: 'red', etiqueta: 'Red o medio', opciones: redes },
+        { nombre: 'tipo', etiqueta: 'Tipo', opciones: tipos },
+        { nombre: 'serie', etiqueta: 'Serie', opciones: series },
+      ]}
+    />
+    <h2 class="sr">Publicaciones</h2>
+    <ul class="registros" id="lista-divulgacion">
+      {divulgacion.map((d) => <ItemDivulgacion d={d} />)}
+    </ul>
+  </div>
+</Base>

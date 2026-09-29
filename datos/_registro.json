@@ -1,0 +1,257 @@
+{
+  "acuerdos/a0001": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "a77feccc92d3"
+  },
+  "acuerdos/a0002": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "8e5139bf2d0f"
+  },
+  "acuerdos/a0003": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "6c8fefcaeb3d"
+  },
+  "acuerdos/a0004": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "5e037975eaf9"
+  },
+  "divulgacion/d0001": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "4d85ebbdd799"
+  },
+  "divulgacion/d0002": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "91adbd02a195"
+  },
+  "divulgacion/d0003": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "0ba259b0f7bb"
+  },
+  "divulgacion/d0004": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "bc052fab3a20"
+  },
+  "divulgacion/d0005": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "bb09681af931"
+  },
+  "divulgacion/d0006": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "3fa04c766b13"
+  },
+  "divulgacion/d0007": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "ae787f4c912e"
+  },
+  "divulgacion/d0008": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "3ab47095940e"
+  },
+  "divulgacion/d0009": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "86991e659628"
+  },
+  "divulgacion/d0010": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "2f175e644502"
+  },
+  "divulgacion/d0011": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "c25bf609a469"
+  },
+  "divulgacion/d0012": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "f7ff8a463e14"
+  },
+  "divulgacion/d0013": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "bd74da480b44"
+  },
+  "divulgacion/d0014": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "6a624e2c265d"
+  },
+  "divulgacion/d0015": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "92cae1707f80"
+  },
+  "divulgacion/d0016": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "efd3d69fbd8c"
+  },
+  "divulgacion/d0017": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "9a182e141fa4"
+  },
+  "divulgacion/d0018": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "42cd65d4b02d"
+  },
+  "divulgacion/d0019": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "0f0784157b36"
+  },
+  "eventos/e0001": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "bf1123e8d9a9"
+  },
+  "eventos/e0002": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "25921d03fd41"
+  },
+  "eventos/e0003": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "6f3fb69c9131"
+  },
+  "eventos/e0004": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "f5046b792ebe"
+  },
+  "eventos/e0005": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "ab6b2f4e3130"
+  },
+  "eventos/e0006": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "3442b0085c89"
+  },
+  "eventos/e0007": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "3c5ae1823e74"
+  },
+  "normales/bene-ensenada": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "40c02ac2a4e1"
+  },
+  "normales/benu-bcs": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "64859cb362b3"
+  },
+  "normales/bycenes": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "8a89309e5892"
+  },
+  "normales/enft": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "0f50a602f96e"
+  },
+  "normales/enrrfm": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "66adff144fcc"
+  },
+  "normales/ens": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "40d8df283676"
+  },
+  "personas/de-la-cruz-gabriela": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "f703d4cdf5e7"
+  },
+  "personas/ejemplo-ana": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "e44dd627101d"
+  },
+  "personas/ejemplo-beto": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "b86dcf5a73e1"
+  },
+  "personas/ejemplo-carla": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "eaf6d5d18c55"
+  },
+  "personas/garcia-velarde-alfredo": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "8fbed1c938f7"
+  },
+  "personas/lopez-ruiz-laura": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "5aee642e54cd"
+  },
+  "personas/ortiz-macias-catalina": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "0668c1f4ee44"
+  },
+  "personas/rubio-moreno-mireya": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "db771b1f56a0"
+  },
+  "personas/soto-medina-yazmin": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "fc47185e4413"
+  },
+  "personas/suarez-daniel-hugo": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "977f3384dc64"
+  },
+  "personas/viramontes-anaya-efren": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "9ab1f42f426a"
+  },
+  "productos/p0001": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "3c03127e9100"
+  },
+  "productos/p0002": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "2a821192e43d"
+  },
+  "productos/p0003": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "273c356608c4"
+  },
+  "productos/p0004": {
+    "alta": "2026-09-28",
+    "actualizado": "2026-09-28",
+    "huella": "f5ac05807433"
+  }
+}
