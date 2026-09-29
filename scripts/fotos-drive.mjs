@@ -63,6 +63,19 @@ const vistos = new Set();
 const nuevas = [];
 const avisos = [];
 
+// Confirmar que la cuenta de servicio ve la carpeta (si no está compartida, Drive la mostraría vacía sin avisar)
+{
+  const r = await fetch(`https://www.googleapis.com/drive/v3/files/${carpeta}?fields=name,mimeType&supportsAllDrives=true`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!r.ok) {
+    console.error(`No se puede abrir la carpeta de fotos (${r.status}). Compártela con la cuenta de servicio como Lector.`);
+    process.exit(1);
+  }
+  const c = await r.json();
+  console.log(`Carpeta de fotos: «${c.name}»`);
+}
+
 const subcarpetas = await listar(`'${carpeta}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false`, 'id, name');
 
 for (const sub of subcarpetas) {
