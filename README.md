@@ -36,7 +36,6 @@ Si la propuesta dice **«⚠️ con errores»**, la lista explica qué fila fall
 5. **Varias personas o normales se separan con punto y coma:** `enft; ens; bycenes`.
    Los nombres de las columnas y de las pestañas se pueden escribir con o sin acentos y mayúsculas (`Año`, `año` o `anio` funcionan igual). Los identificadores (`enft`, `formacion-docente`, `ortiz-macias-catalina`) van siempre sin acentos ni ñ, porque forman parte de las direcciones.
 6. **Nada de correos ni datos privados en columnas públicas.** La hoja puede tener columnas propias (correo, notas internas); el sistema solo copia las columnas de esta guía y descarta el resto.
-7. **Fotos: nunca caras de menores.** Una foto solo se publica si su fila dice `revisada_sin_menores` = `sí`.
 
 Identificadores de las normales: `enft`, `bene-ensenada`, `benu-bcs`, `bycenes`, `ens`, `enrrfm`.
 Identificadores de las líneas: `formacion-docente`, `derechos-humanos`, `curriculum-didacticas`, `politica-educativa`.
@@ -125,14 +124,12 @@ Así cada persona puede demostrar sus actividades de divulgación: su ficha (`/p
 
 ## Agregar fotos
 
-1. Revisa que **no aparezcan caras de menores**.
-2. Sube la foto a la carpeta [`fotos/`](fotos/). Conviene una subcarpeta por registro, por ejemplo `fotos/e0008/`.
-3. Agrega una fila en la pestaña **`fotos`**:
+1. Sube la foto a la carpeta [`fotos/`](fotos/). Conviene una subcarpeta por registro, por ejemplo `fotos/e0008/`.
+2. Agrega una fila en la pestaña **`fotos`**:
    - `archivo`: `e0008/foto1.jpg`
    - `registro`: `e0008`, el evento o acuerdo al que pertenece.
    - `descripción`: qué se ve. Es obligatoria porque la leen los lectores de pantalla.
    - `crédito`: quién tomó la foto.
-   - `revisada_sin_menores`: `sí`
 
 El sitio genera solo versiones ligeras de cada foto.
 

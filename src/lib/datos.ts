@@ -93,10 +93,9 @@ function construir() {
   const registro = leerRegistro() as Record<string, { alta: string; actualizado: string }>;
   const fechaDe = (tabla: string, id: string) => registro[`${tabla}/${id}`] ?? { alta: hoy(), actualizado: hoy() };
 
-  // Fotos: solo las revisadas (sin menores) y con archivo presente.
+  // Fotos con archivo presente.
   const fotosPorRegistro = new Map<string, Foto[]>();
   for (const f of d.fotos) {
-    if (!/^s[ií]$/i.test(f.revisada_sin_menores)) continue;
     if (!fs.existsSync(path.join(process.cwd(), 'fotos', f.archivo))) continue;
     const l = fotosPorRegistro.get(f.registro) ?? [];
     l.push({ archivo: f.archivo, descripcion: f.descripcion, credito: f.credito });

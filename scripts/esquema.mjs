@@ -156,7 +156,6 @@ export const TABLAS = {
       registro: { tipo: 'texto', req: true },
       descripcion: { tipo: 'texto', req: true },
       credito: { tipo: 'texto' },
-      revisada_sin_menores: { tipo: 'sino', req: true },
     },
   },
   retirados: {

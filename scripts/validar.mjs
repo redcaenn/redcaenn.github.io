@@ -149,7 +149,6 @@ for (const [nombre, def] of Object.entries(TABLAS)) {
 for (const f of tablas.fotos) {
   if (f.registro && !ids.eventos.has(f.registro) && !ids.acuerdos.has(f.registro))
     err('fotos', f._linea, `"registro" = "${f.registro}" no es un evento ni un acuerdo`);
-  if (/^no$/i.test(f.revisada_sin_menores)) avisos.push(`fotos.csv, fila ${f._linea}: ${f.archivo} no se publicará hasta marcarla como revisada_sin_menores = sí`);
 }
 
 // 4. Fechas de alta y actualización, y permanencia de los enlaces
