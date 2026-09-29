@@ -10,6 +10,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  id-token: write # para que Google reconozca a este repositorio sin llaves
 
 jobs:
   sincronizar:
@@ -22,11 +23,24 @@ jobs:
           cache: npm
       - run: npm ci
 
+      # Google confía en este repositorio (rama main) y entrega un permiso de solo lectura
+      # que vence en una hora. No hay ninguna llave guardada en ningún lado.
+      - name: Pedir a Google acceso de solo lectura a la hoja
+        id: google
+        if: vars.GCP_WIF_PROVIDER != ''
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+          token_format: access_token
+          access_token_scopes: https://www.googleapis.com/auth/spreadsheets.readonly
+          create_credentials_file: false
+
       - name: Descargar la hoja
         run: npm run sheets
         env:
-          GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
-          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          GOOGLE_SHEET_ID: ${{ vars.GOOGLE_SHEET_ID }}
+          GOOGLE_ACCESS_TOKEN: ${{ steps.google.outputs.access_token }}
 
       - name: Revisar los datos
         id: revisar

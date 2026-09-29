@@ -1,8 +1,11 @@
 // Descarga la hoja de Google (privada) y la guarda como CSV en /datos.
 //
-// Necesita dos variables (en GitHub van como "secrets"):
-//   GOOGLE_SHEET_ID              el identificador de la hoja (lo que va entre /d/ y /edit en su dirección)
-//   GOOGLE_SERVICE_ACCOUNT_JSON  el contenido del archivo de llave de la cuenta de servicio
+// Necesita:
+//   GOOGLE_SHEET_ID      el identificador de la hoja (lo que va entre /d/ y /edit en su dirección)
+// y una de estas dos formas de acceso:
+//   GOOGLE_ACCESS_TOKEN  permiso temporal de solo lectura. En GitHub lo entrega Google sin ninguna llave
+//                        (Workload Identity Federation, ver .github/workflows/sincronizar.yml). Es la forma normal.
+//   GOOGLE_SERVICE_ACCOUNT_JSON  archivo de llave de la cuenta de servicio (solo si alguna vez se usa desde otra máquina)
 //
 // Cada pestaña se llama como un archivo de /datos, con o sin acentos
 // (productos, eventos, acuerdos, divulgación, personas, normales, líneas, obra colectiva, fotos, retirados).
@@ -17,9 +20,10 @@ import { DATOS, normalizarEncabezado, visible } from './leer.mjs';
 
 const hoja = process.env.GOOGLE_SHEET_ID;
 const llaveJSON = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+const tokenDirecto = process.env.GOOGLE_ACCESS_TOKEN;
 
-if (!hoja || !llaveJSON) {
-  console.log('La sincronización con Google Sheets no está configurada (faltan GOOGLE_SHEET_ID o GOOGLE_SERVICE_ACCOUNT_JSON). No se cambió nada.');
+if (!hoja || (!llaveJSON && !tokenDirecto)) {
+  console.log('La sincronización con Google Sheets no está configurada (falta el identificador de la hoja o el acceso de Google). No se cambió nada.');
   process.exit(0);
 }
 
@@ -59,7 +63,7 @@ function normalizarFecha(v) {
 
 const celdaCSV = (v) => (/[",\n\r]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v);
 
-const t = await token();
+const t = tokenDirecto || (await token());
 const r = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${hoja}?fields=sheets.properties.title`, {
   headers: { Authorization: `Bearer ${t}` },
 });

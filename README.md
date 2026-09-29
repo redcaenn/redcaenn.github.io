@@ -178,19 +178,41 @@ src/                       ← páginas y diseño (Astro)
 
 ### Configurar la hoja de Google (una sola vez)
 
-1. **Crear la hoja.** En Google Drive, crea una hoja con una pestaña por archivo de `datos/`, con el mismo nombre (`productos`, `eventos`…). En cada pestaña: **Archivo → Importar → Subir** el CSV correspondiente → «Reemplazar la hoja actual» y **desmarca «Convertir texto en números, fechas y fórmulas»**. Luego selecciona todo y aplica **Formato → Número → Texto sin formato**, para que Sheets no cambie las fechas.
-2. **Crear la cuenta de servicio.** En [console.cloud.google.com](https://console.cloud.google.com):
-   1. Crea un proyecto («redcaenn-sitio»).
-   2. Activa la **Google Sheets API**.
-   3. En **IAM → Cuentas de servicio**, crea una cuenta.
-   4. En **Claves → Agregar clave → JSON**, descarga el archivo. **Esa llave no se sube al repositorio ni se comparte por chat.**
-3. **Compartir la hoja** con el correo de la cuenta de servicio (`…@….iam.gserviceaccount.com`) como **Lector**.
-4. **Guardar los datos en GitHub.** En el repositorio: **Settings → Secrets and variables → Actions → New repository secret**:
-   - `GOOGLE_SHEET_ID`: lo que va entre `/d/` y `/edit` en la dirección de la hoja.
-   - `GOOGLE_SERVICE_ACCOUNT_JSON`: el contenido completo del archivo JSON.
-5. **Permitir las propuestas automáticas.** En **Settings → Actions → General**, activa «Allow GitHub Actions to create and approve pull requests».
+La conexión **no usa llaves**: Google confía directamente en este repositorio (*Workload Identity Federation*)
+y le entrega a la sincronización diaria un permiso de solo lectura que vence en una hora. No hay ningún archivo
+secreto que se pueda filtrar. Todo es gratuito y el proyecto de Google Cloud **no necesita tarjeta ni facturación**.
 
-Después borra la llave de tu computadora. Si se pierde, se crea otra desde la misma pantalla.
+1. **La hoja.** Sube `Hoja datos Red CAENN.xlsx` a Google Drive (cuenta de la Red) → *Abrir con Hojas de cálculo de Google*
+   → *Archivo → Guardar como Hojas de cálculo de Google*. Borra el .xlsx de Drive.
+2. **El proyecto.** En [console.cloud.google.com](https://console.cloud.google.com), crea el proyecto `redcaenn-sitio`
+   y habilita la **Google Sheets API**.
+3. **La cuenta de servicio.** *IAM y administración → Cuentas de servicio → Crear*: nombre `lector-sitio`, **sin roles**.
+   No se crea ninguna clave.
+4. **La confianza con GitHub.** Abre **Cloud Shell** (ícono `>_` arriba a la derecha) y pega:
+
+   ```bash
+   PROYECTO=$(gcloud config get-value project)
+   NUM=$(gcloud projects describe $PROYECTO --format='value(projectNumber)')
+   CUENTA=lector-sitio@$PROYECTO.iam.gserviceaccount.com
+   gcloud services enable iamcredentials.googleapis.com sts.googleapis.com sheets.googleapis.com
+   gcloud iam workload-identity-pools create github --location=global --display-name="GitHub"
+   gcloud iam workload-identity-pools providers create-oidc redcaenn --location=global \
+     --workload-identity-pool=github --display-name="Repositorio redcaenn" \
+     --issuer-uri="https://token.actions.githubusercontent.com" \
+     --attribute-mapping="google.subject=assertion.sub,attribute.repository=assertion.repository,attribute.ref=assertion.ref" \
+     --attribute-condition="assertion.repository=='redcaenn/redcaenn.github.io' && assertion.ref=='refs/heads/main'"
+   gcloud iam service-accounts add-iam-policy-binding $CUENTA --role=roles/iam.workloadIdentityUser \
+     --member="principalSet://iam.googleapis.com/projects/$NUM/locations/global/workloadIdentityPools/github/attribute.repository/redcaenn/redcaenn.github.io"
+   echo; echo "GCP_WIF_PROVIDER = projects/$NUM/locations/global/workloadIdentityPools/github/providers/redcaenn"
+   echo "GCP_SERVICE_ACCOUNT = $CUENTA"
+   ```
+
+   Solo este repositorio, y solo desde su rama `main`, puede pedir el permiso.
+5. **Compartir la hoja** con el correo `lector-sitio@…iam.gserviceaccount.com` como **Lector**.
+6. **Variables en GitHub** (*Settings → Secrets and variables → Actions → Variables*), ninguna es secreta:
+   `GCP_WIF_PROVIDER` y `GCP_SERVICE_ACCOUNT` (las dos líneas que imprime el paso 4) y `GOOGLE_SHEET_ID`
+   (lo que va entre `/d/` y `/edit` en la dirección de la hoja).
+7. **Permitir las propuestas automáticas:** *Settings → Actions → General* → «Allow GitHub Actions to create and approve pull requests».
 
 ### Publicar en GitHub Pages
 
