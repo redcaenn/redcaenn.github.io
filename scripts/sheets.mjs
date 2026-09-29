@@ -67,7 +67,12 @@ const t = tokenDirecto || (await token());
 const r = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${hoja}?fields=sheets.properties.title`, {
   headers: { Authorization: `Bearer ${t}` },
 });
-if (!r.ok) throw new Error(`No se pudo abrir la hoja (${r.status}). ¿Está compartida con la cuenta de servicio? ${await r.text()}`);
+if (!r.ok) {
+  const texto = await r.text();
+  if (texto.includes('Office file'))
+    throw new Error('El identificador es de un archivo de Excel (.xlsx) abierto en Drive, no de una hoja de Google. En Drive: Archivo → Guardar como Hojas de cálculo de Google, compartir esa copia con la cuenta de servicio y usar su identificador.');
+  throw new Error(`No se pudo abrir la hoja (${r.status}). ¿Está compartida con la cuenta de servicio como Lector? ${texto}`);
+}
 // Pestañas por su nombre interno: "Divulgación" → divulgacion, "Obra colectiva" → obra_colectiva
 const pestanas = new Map((await r.json()).sheets.map((s) => [normalizarEncabezado(s.properties.title), s.properties.title]));
 
