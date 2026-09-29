@@ -1,0 +1,2 @@
+# Los datos siempre con saltos de línea Unix, vengan de donde vengan
+*.csv text eol=lf
