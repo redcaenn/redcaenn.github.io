@@ -33,13 +33,21 @@ jobs:
           workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
           service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
           token_format: access_token
-          access_token_scopes: https://www.googleapis.com/auth/spreadsheets.readonly
+          access_token_scopes: https://www.googleapis.com/auth/spreadsheets.readonly,https://www.googleapis.com/auth/drive.readonly
           create_credentials_file: false
 
       - name: Descargar la hoja
         run: npm run sheets
         env:
           GOOGLE_SHEET_ID: ${{ vars.GOOGLE_SHEET_ID }}
+          GOOGLE_ACCESS_TOKEN: ${{ steps.google.outputs.access_token }}
+
+      - name: Traer las fotos de la carpeta de Drive
+        run: |
+          set -o pipefail
+          node scripts/fotos-drive.mjs | tee fotos.txt
+        env:
+          GOOGLE_FOTOS_FOLDER_ID: ${{ vars.GOOGLE_FOTOS_FOLDER_ID }}
           GOOGLE_ACCESS_TOKEN: ${{ steps.google.outputs.access_token }}
 
       - name: Revisar los datos
@@ -54,16 +62,16 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if git diff --quiet -- datos; then
-            echo "La hoja no tiene cambios."
+          if [ -z "$(git status --porcelain -- datos fotos)" ]; then
+            echo "La hoja y la carpeta de fotos no tienen cambios."
             exit 0
           fi
           rama=sincronizacion-sheets
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -B "$rama"
-          git add datos
-          git commit -m "Datos: cambios de la hoja de Google ($(date +%F))"
+          git add datos fotos
+          git commit -m "Datos: cambios de la hoja y de las fotos de Drive ($(date +%F))"
           git push --force origin "$rama"
 
           if [ "${{ steps.revisar.outputs.estado }}" = "0" ]; then
@@ -76,6 +84,16 @@ jobs:
           {
             echo "$estado"
             echo
+            if [ -s fotos.txt ] && ! grep -q "sin cambios\|no configurado" fotos.txt; then
+              echo "### Fotos"
+              echo
+              echo "Puedes verlas en la pestaña **Files changed** antes de aprobar."
+              echo
+              echo '```'
+              cat fotos.txt
+              echo '```'
+              echo
+            fi
             echo '```'
             cat revision.txt
             echo '```'

@@ -124,14 +124,22 @@ Así cada persona puede demostrar sus actividades de divulgación: su ficha (`/p
 
 ## Agregar fotos
 
-1. Sube la foto a la carpeta [`fotos/`](fotos/). Conviene una subcarpeta por registro, por ejemplo `fotos/e0008/`.
-2. Agrega una fila en la pestaña **`fotos`**:
-   - `archivo`: `e0008/foto1.jpg`
-   - `registro`: `e0008`, el evento o acuerdo al que pertenece.
-   - `descripción`: qué se ve. Es obligatoria porque la leen los lectores de pantalla.
-   - `crédito`: quién tomó la foto.
+**La forma normal: la carpeta de Drive «Fotos del sitio».**
 
-El sitio genera solo versiones ligeras de cada foto.
+1. Adentro hay una subcarpeta por evento o acuerdo. Su nombre **empieza con el id**: `e0004 Sesión inaugural`, `a0002 Firma en la ENFT`. Si no existe, se crea con ese formato.
+2. Arrastra las fotos a la subcarpeta, desde la computadora o desde la app de Drive. Cualquier tamaño y formato sirve: JPG, PNG o HEIC de iPhone.
+
+Cada mañana el sistema, solo:
+- reduce las fotos a 2000 px y les quita los metadatos, incluida la ubicación;
+- les pone un nombre estable (`fotos/drive/e0004-01.jpg`);
+- escribe una descripción automática («Sesión inaugural… — foto 1») y pone como crédito el nombre de quien subió la foto;
+- las incluye en la propuesta de cambios, donde se ven antes de aprobar.
+
+Si borras una foto de Drive, sale del sitio en la siguiente propuesta.
+
+**Para cambiar la descripción o el crédito** de una foto: en la pestaña `fotos` de la hoja, agrega una fila con `archivo` = `drive/e0004-01.jpg` (el nombre aparece en la propuesta de cambios), `registro` = `e0004` y tu `descripción` y `crédito`. La hoja manda sobre lo automático.
+
+**A mano, sin Drive:** sube la foto a [`fotos/`](fotos/) en GitHub (**Add file → Upload files**) y agrega su fila en la pestaña `fotos` con `archivo`, `registro`, `descripción` y `crédito`. Conviene reducirla antes a unos 2000 px.
 
 ---
 
@@ -209,7 +217,8 @@ secreto que se pueda filtrar. Todo es gratuito y el proyecto de Google Cloud **n
 6. **Variables en GitHub** (*Settings → Secrets and variables → Actions → Variables*), ninguna es secreta:
    `GCP_WIF_PROVIDER` y `GCP_SERVICE_ACCOUNT` (las dos líneas que imprime el paso 4) y `GOOGLE_SHEET_ID`
    (lo que va entre `/d/` y `/edit` en la dirección de la hoja).
-7. **Permitir las propuestas automáticas:** *Settings → Actions → General* → «Allow GitHub Actions to create and approve pull requests».
+7. **Fotos (opcional):** crea en Drive la carpeta «Fotos del sitio», compártela con los investigadores como Editor y con `lector-sitio@…` como **Lector**; en Cloud Shell corre `gcloud services enable drive.googleapis.com`, y guarda en GitHub la variable `GOOGLE_FOTOS_FOLDER_ID` (lo que va después de `/folders/` en la dirección de la carpeta).
+8. **Permitir las propuestas automáticas:** *Settings → Actions → General* → «Allow GitHub Actions to create and approve pull requests».
 
 ### Publicar en GitHub Pages
 
