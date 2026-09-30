@@ -24,7 +24,7 @@ const lista = await Promise.all(
           <a href={f.grande.src} data-visor aria-label={`Ver en grande: ${f.descripcion.replace(/\[EJEMPLO\]\s*/g, '')}`}>
             <Image src={f.img!} alt={f.descripcion} widths={[400, 800]} sizes="(min-width: 60rem) 22rem, 100vw" />
           </a>
-          <figcaption set:html={marcar(f.descripcion) + (f.credito ? ` Foto: ${marcar(f.credito)}.` : '')} />
+          <figcaption set:html={`<span class="pie-descripcion">${marcar(f.descripcion)}</span>` + (f.credito ? `<span class="pie-credito">Foto: ${marcar(f.credito)}</span>` : '')} />
         </figure>
       </li>
     ))}

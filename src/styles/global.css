@@ -394,6 +394,10 @@ main { flex: 1 0 auto; }
 .visor-ayuda { position: fixed; top: calc(env(safe-area-inset-top, 0px) + .75rem); right: 1rem; margin: 0; color: #d9cfc2; font-size: .85rem; }
 .visor:focus-visible { outline: none; }
 html.visor-abierto { overflow: hidden; }
+
+/* Pie de foto: descripción y crédito en líneas separadas */
+.pie-descripcion, .pie-credito { display: block; }
+.pie-credito { font-size: .85em; opacity: .8; margin-top: .25rem; }
 @media (prefers-reduced-motion: no-preference) {
   .visor[open] img { animation: visor-entra .18s ease-out; }
   @keyframes visor-entra { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: none; } }
