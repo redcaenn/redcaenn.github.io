@@ -21,7 +21,7 @@ const lista = await Promise.all(
     {lista.map((f) => (
       <li>
         <figure>
-          <a href={f.grande.src}>
+          <a href={f.grande.src} data-visor aria-label={`Ver en grande: ${f.descripcion.replace(/\[EJEMPLO\]\s*/g, '')}`}>
             <Image src={f.img!} alt={f.descripcion} widths={[400, 800]} sizes="(min-width: 60rem) 22rem, 100vw" />
           </a>
           <figcaption set:html={marcar(f.descripcion) + (f.credito ? ` Foto: ${marcar(f.credito)}.` : '')} />
@@ -30,3 +30,49 @@ const lista = await Promise.all(
     ))}
   </ul>
 )}
+
+<!-- Visor: la foto se abre en grande sobre la página; un clic en cualquier parte (o Esc) la cierra.
+     Sin JavaScript, el enlace abre la foto grande como página aparte. -->
+<dialog class="visor" aria-label="Foto en grande">
+  <figure>
+    <img alt="" />
+    <figcaption></figcaption>
+  </figure>
+  <p class="visor-ayuda" aria-hidden="true">Clic en cualquier parte para cerrar</p>
+</dialog>
+
+<script>
+  const visor = document.querySelector<HTMLDialogElement>('dialog.visor');
+  if (visor && typeof visor.showModal === 'function') {
+    const img = visor.querySelector('img')!;
+    const pie = visor.querySelector('figcaption')!;
+    let origen: HTMLElement | null = null;
+
+    document.querySelectorAll<HTMLAnchorElement>('a[data-visor]').forEach((a) => {
+      a.addEventListener('click', (e) => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey) return; // abrir en pestaña nueva sigue funcionando
+        e.preventDefault();
+        const mini = a.querySelector('img');
+        img.src = a.href;
+        img.alt = mini?.alt ?? '';
+        pie.innerHTML = a.closest('figure')?.querySelector('figcaption')?.innerHTML ?? '';
+        origen = a;
+        document.documentElement.classList.add('visor-abierto');
+        visor.showModal();
+      });
+    });
+
+    // Cerrar: un clic en cualquier parte o Esc. La limpieza no depende del evento 'close',
+    // que algunos navegadores no disparan de forma confiable.
+    const cerrar = () => {
+      if (visor.open) visor.close();
+      if (!document.documentElement.classList.contains('visor-abierto')) return;
+      document.documentElement.classList.remove('visor-abierto');
+      img.removeAttribute('src');
+      origen?.focus();
+    };
+    visor.addEventListener('click', cerrar);
+    visor.addEventListener('cancel', (e) => { e.preventDefault(); cerrar(); }); // Esc
+    visor.addEventListener('close', cerrar);
+  }
+</script>

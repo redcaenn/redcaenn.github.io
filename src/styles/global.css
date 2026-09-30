@@ -379,3 +379,22 @@ main { flex: 1 0 auto; }
 .pie-legal { max-width: none; }
 .pie h2 .marca { font-size: .65rem; letter-spacing: .04em; vertical-align: .15em; }
 .sesion p { max-width: none; }
+
+/* ——— Visor de fotos ——— */
+.galeria a[data-visor] { display: block; cursor: zoom-in; }
+.visor {
+  border: 0; padding: 0; margin: 0; max-width: none; max-height: none;
+  width: 100vw; height: 100dvh; background: transparent; cursor: zoom-out;
+}
+.visor::backdrop { background: rgba(18, 14, 10, .97); }
+.visor[open] { display: grid; place-items: center; }
+.visor figure { margin: 0; display: grid; justify-items: center; gap: .75rem; padding: 1rem; max-width: 100%; }
+.visor img { max-width: min(94vw, 1600px); max-height: 82dvh; width: auto; height: auto; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,.4); }
+.visor figcaption { color: #f4ede4; font-size: .95rem; text-align: center; max-width: 60ch; }
+.visor-ayuda { position: fixed; top: calc(env(safe-area-inset-top, 0px) + .75rem); right: 1rem; margin: 0; color: #d9cfc2; font-size: .85rem; }
+.visor:focus-visible { outline: none; }
+html.visor-abierto { overflow: hidden; }
+@media (prefers-reduced-motion: no-preference) {
+  .visor[open] img { animation: visor-entra .18s ease-out; }
+  @keyframes visor-entra { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: none; } }
+}
