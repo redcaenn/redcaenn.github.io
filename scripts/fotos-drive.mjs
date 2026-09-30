@@ -95,7 +95,11 @@ for (const sub of subcarpetas) {
   for (const a of archivos) {
     vistos.add(a.id);
     const previo = mapa[a.id];
-    if (previo && previo.registro === id && previo.md5 === a.md5Checksum && fs.existsSync(path.join(DIR, previo.archivo))) continue;
+    const credito = a.owners?.[0]?.displayName || a.lastModifyingUser?.displayName || '';
+    if (previo && previo.registro === id && previo.md5 === a.md5Checksum && fs.existsSync(path.join(DIR, previo.archivo))) {
+      previo.credito = credito; // si cambia el nombre de la cuenta en Google, el crédito se actualiza
+      continue;
+    }
 
     // Nombre estable: se conserva si la foto ya existía; si es nueva, el siguiente número libre del registro
     let archivo = previo?.registro === id ? previo.archivo : null;
@@ -127,7 +131,7 @@ for (const sub of subcarpetas) {
       archivo,
       registro: id,
       md5: a.md5Checksum,
-      credito: a.owners?.[0]?.displayName || a.lastModifyingUser?.displayName || '',
+      credito,
     };
     nuevas.push(`${archivo}  ←  ${sub.name} / ${a.name}`);
   }
