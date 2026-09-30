@@ -58,6 +58,10 @@ const titulos = new Map(
   [...leerTabla('eventos').filas, ...leerTabla('acuerdos').filas].map((f) => [f.id, f.titulo.replace(/\[EJEMPLO\]\s*/g, '')]),
 );
 
+// Nombres de cuentas de Drive → crédito que se publica (datos/sitio.json, "creditos_drive")
+const creditos = JSON.parse(fs.readFileSync(path.join(DATOS, 'sitio.json'), 'utf8')).creditos_drive ?? {};
+const creditoPublico = (nombre) => creditos[nombre] ?? creditos[nombre?.toLowerCase()] ?? nombre;
+
 const mapa = fs.existsSync(MAPA) ? JSON.parse(fs.readFileSync(MAPA, 'utf8')) : {};
 const vistos = new Set();
 const nuevas = [];
@@ -170,7 +174,7 @@ const automaticas = Object.values(mapa)
       archivo,
       registro: m.registro,
       descripcion: hoja?.descripcion || `${titulos.get(m.registro)} — foto ${numero(m.archivo)}`,
-      credito: hoja?.credito || m.credito,
+      credito: hoja?.credito || creditoPublico(m.credito),
     };
   });
 const filasFinales = [...porArchivo.values(), ...automaticas];

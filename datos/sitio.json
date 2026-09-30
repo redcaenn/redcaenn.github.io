@@ -68,5 +68,9 @@
       "Cartografías narrativas",
       "Memoria audiovisual"
     ]
+  },
+  "creditos_drive": {
+    "_instrucciones": "Nombre que da Google Drive → crédito que se publica bajo la foto.",
+    "caenn": "Red CAENN"
   }
 }

@@ -5,6 +5,7 @@
 import { Image, getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import type { Foto } from '../lib/datos';
+import { marcar } from '../lib/formato';
 interface Props { fotos: Foto[] }
 const { fotos } = Astro.props;
 const archivos = import.meta.glob<{ default: ImageMetadata }>('/fotos/**/*.{jpg,jpeg,png,webp,JPG,JPEG,PNG,WEBP}', { eager: true });
@@ -23,7 +24,7 @@ const lista = await Promise.all(
           <a href={f.grande.src}>
             <Image src={f.img!} alt={f.descripcion} widths={[400, 800]} sizes="(min-width: 60rem) 22rem, 100vw" />
           </a>
-          <figcaption>{f.descripcion}{f.credito && ` Foto: ${f.credito}.`}</figcaption>
+          <figcaption set:html={marcar(f.descripcion) + (f.credito ? ` Foto: ${marcar(f.credito)}.` : '')} />
         </figure>
       </li>
     ))}
