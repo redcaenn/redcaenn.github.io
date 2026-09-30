@@ -61,10 +61,11 @@ const ld = {
     <div class="rejilla rejilla-2">
       <section aria-labelledby="obra-t">
         <h2 id="obra-t">Obra editorial colectiva</h2>
-        <p>Resultado central del Seminario. Avance de los capítulos:</p>
+        <p>Resultado central del Seminario{obra.length > 0 && '. Avance de los capítulos:'}</p>
         {ejemploObra && <div class="aviso"><p>Los capítulos que aparecen aquí son <mark class="marca marca-ejemplo">Ejemplo</mark>. Se reemplazan en <code>datos/obra_colectiva.csv</code>.</p></div>}
-        <p class="meta">{obra.length} capítulos registrados: {porEstado.map(([t, n]) => `${n} ${t.toLowerCase()}`).join(' · ')}</p>
-        <div class="tabla-envoltura">
+        {obra.length === 0 && <p class="meta">Todavía no hay capítulos registrados.</p>}
+        {obra.length > 0 && <p class="meta">{obra.length} capítulos registrados: {porEstado.map(([t, n]) => `${n} ${t.toLowerCase()}`).join(' · ')}</p>}
+        {obra.length > 0 && <div class="tabla-envoltura">
           <table>
             <caption class="sr">Capítulos de la obra colectiva</caption>
             <thead><tr><th scope="col">Capítulo</th><th scope="col">Autores</th><th scope="col">Estado</th></tr></thead>
@@ -78,7 +79,7 @@ const ld = {
               ))}
             </tbody>
           </table>
-        </div>
+        </div>}
       </section>
 
       <section aria-labelledby="crono-t">

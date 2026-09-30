@@ -99,21 +99,6 @@
     "actualizado": "2026-09-28",
     "huella": "efd3d69fbd8c"
   },
-  "divulgacion/d0017": {
-    "alta": "2026-09-28",
-    "actualizado": "2026-09-28",
-    "huella": "9a182e141fa4"
-  },
-  "divulgacion/d0018": {
-    "alta": "2026-09-28",
-    "actualizado": "2026-09-28",
-    "huella": "42cd65d4b02d"
-  },
-  "divulgacion/d0019": {
-    "alta": "2026-09-28",
-    "actualizado": "2026-09-28",
-    "huella": "0f0784157b36"
-  },
   "eventos/e0001": {
     "alta": "2026-09-28",
     "actualizado": "2026-09-28",
@@ -184,21 +169,6 @@
     "actualizado": "2026-09-28",
     "huella": "f703d4cdf5e7"
   },
-  "personas/ejemplo-ana": {
-    "alta": "2026-09-28",
-    "actualizado": "2026-09-28",
-    "huella": "e44dd627101d"
-  },
-  "personas/ejemplo-beto": {
-    "alta": "2026-09-28",
-    "actualizado": "2026-09-28",
-    "huella": "b86dcf5a73e1"
-  },
-  "personas/ejemplo-carla": {
-    "alta": "2026-09-28",
-    "actualizado": "2026-09-28",
-    "huella": "eaf6d5d18c55"
-  },
   "personas/garcia-velarde-alfredo": {
     "alta": "2026-09-28",
     "actualizado": "2026-09-28",
@@ -233,25 +203,5 @@
     "alta": "2026-09-28",
     "actualizado": "2026-09-28",
     "huella": "9ab1f42f426a"
-  },
-  "productos/p0001": {
-    "alta": "2026-09-28",
-    "actualizado": "2026-09-28",
-    "huella": "3c03127e9100"
-  },
-  "productos/p0002": {
-    "alta": "2026-09-28",
-    "actualizado": "2026-09-28",
-    "huella": "2a821192e43d"
-  },
-  "productos/p0003": {
-    "alta": "2026-09-28",
-    "actualizado": "2026-09-28",
-    "huella": "273c356608c4"
-  },
-  "productos/p0004": {
-    "alta": "2026-09-28",
-    "actualizado": "2026-09-28",
-    "huella": "f5ac05807433"
   }
 }

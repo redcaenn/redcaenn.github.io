@@ -4,6 +4,7 @@
   "nombre_corto": "Red CAENN",
   "fundacion": 2021,
   "url": "https://redcaenn.com",
+  "indexar_en_buscadores": false,
   "correo": "[PENDIENTE]",
   "formulario_registro": "https://forms.gle/E4xr9Vhm2tyXS7sJ8",
   "redes_confirmadas": false,

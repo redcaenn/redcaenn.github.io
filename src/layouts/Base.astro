@@ -53,7 +53,7 @@ const fuentes = [
     <meta name="description" content={desc} />
     <link rel="canonical" href={canonica} />
     {/* Mientras haya datos de ejemplo, la versión de revisión no aparece en buscadores. */}
-    {(sinIndice || hayEjemplos) && <meta name="robots" content="noindex, nofollow" />}
+    {(sinIndice || hayEjemplos || !sitio.indexar_en_buscadores) && <meta name="robots" content="noindex, nofollow" />}
     <link rel="preload" href={sansUrl} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={serifUrl} as="font" type="font/woff2" crossorigin />
     <style is:inline set:html={fuentes} />
