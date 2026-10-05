@@ -64,6 +64,10 @@ jobs:
         run: |
           if [ -z "$(git status --porcelain -- datos fotos)" ]; then
             echo "La hoja y la carpeta de fotos no tienen cambios."
+            # Si quedó abierta una propuesta anterior (por ejemplo, con errores ya corregidos), se cierra
+            if gh pr view sincronizacion-sheets --json state -q .state 2>/dev/null | grep -q OPEN; then
+              gh pr close sincronizacion-sheets --delete-branch --comment "Cerrada sola: la hoja y el sitio ya coinciden."
+            fi
             exit 0
           fi
           rama=sincronizacion-sheets
